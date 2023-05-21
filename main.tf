@@ -15,6 +15,10 @@ module "vpc_networking" {
 
 }
 
+# module "sg"{
+
+# }
+
 module "ec2_ubuntu" {
   source = "./modules/ec2_ubuntu"
 
@@ -34,6 +38,11 @@ module "ec2_ubuntu" {
 #   public_subnet_cidr = module.vpc_networking.public_subnets_cidr[1]
 # }
 
+module "acm" {
+  source = "./modules/acm"
+
+}
+
 module "alb" {
   source = "./modules/alb"
 
@@ -42,5 +51,6 @@ module "alb" {
   alb_name      = "My-ALB"
   internal      = "false"
   subnets_ids     = module.vpc_networking.public_subnets_ids
+  aws_acm_certificate_arn  = module.acm.aws_acm_certificate_arn
 
 }

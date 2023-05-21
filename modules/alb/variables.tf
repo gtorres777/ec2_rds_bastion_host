@@ -11,7 +11,7 @@ variable "alb_name" {
 
 variable "load_balancing_algorithm_type" {
   type        = string
-  description = "Key pair name"
+  description = "algorithm type used for the ALB"
   default     = "round_robin"
 }
 
@@ -28,5 +28,10 @@ variable "internal" {
 
 variable "subnets_ids" {
   description = "Subnets ids where the ALB instance is going to be deployed"
+}
+
+variable "aws_acm_certificate_arn" {
+  type        = string
+  description = "ARN of the certificate generated from ACM"
 }
 
