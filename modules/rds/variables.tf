@@ -15,6 +15,10 @@ variable "identifier" {
   default = "postgres-rds"
 }
 
+variable "db_name" {
+  type    = string
+}
+
 variable "storage_type" {
   type    = string
   description = "storage type for the RDS instance"
@@ -30,7 +34,7 @@ variable "engine" {
 variable "engine_version" {
   type    = string
   description = "version for the engine chose for the RDS instance"
-  default = "14.1"
+  default = "13.7"
 }
 
 variable "instance_class" {
@@ -75,5 +79,8 @@ variable "skip_final_snapshot" {
 variable "public_subnet_cidr" {
   description = "CIDR block for the public Subnet tht will have access to PostgreSQL"
   default     = ["10.0.3.0/24","10.0.4.0/24"]
+}
+
+variable "rds_sg_name" {
 }
 

@@ -18,6 +18,21 @@ resource "aws_internet_gateway" "main_igw" {
   }
 }
 
+resource "aws_dms_replication_subnet_group" "dms_subnet_group" {
+  replication_subnet_group_description = "Example replication subnet group"
+  replication_subnet_group_id          = "example-dms-replication-subnet-group-tf"
+
+  subnet_ids = aws_subnet.public_subnets.*.id
+
+  tags = {
+    Name = "dms_subnet_group"
+  }
+
+  depends_on = [
+    aws_subnet.public_subnets
+  ]
+}
+
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.main_vpc.id
 
@@ -53,4 +68,26 @@ resource "aws_nat_gateway" "nat_gws" {
   }
 
   depends_on = [aws_internet_gateway.main_igw]
+}
+
+
+resource "aws_security_group" "dms_sg" {
+  name = "dms_sg"
+  vpc_id      = aws_vpc.main_vpc.id
+
+  # Only Postgres in
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow all outbound traffic.
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }

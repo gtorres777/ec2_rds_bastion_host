@@ -1,6 +1,7 @@
 resource "aws_db_instance" "rds_instance" {
   allocated_storage      = var.allocated_storage
   identifier             = var.identifier
+  db_name                = var.db_name
   storage_type           = var.storage_type
   engine                 = var.engine
   engine_version         = var.engine_version
@@ -16,7 +17,7 @@ resource "aws_db_instance" "rds_instance" {
 }
 
 resource "aws_security_group" "rds_sg" {
-  name = "rds_sg"
+  name = var.rds_sg_name
   vpc_id      = var.vpc_id
 
   # Only Postgres in
@@ -24,7 +25,7 @@ resource "aws_security_group" "rds_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["${var.public_subnet_cidr}"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Allow all outbound traffic.
