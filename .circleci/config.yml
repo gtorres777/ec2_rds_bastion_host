@@ -108,12 +108,16 @@ jobs:
             echo 'export AWS_SECRET_ACCESS_KEY=OlyesaHHHETNA611NjxfmVXSPD8OaBPPD0donE9U' >> $BASH_ENV
             source $BASH_ENV
       - run:
-          name: "Apply changes"
-          command: scripts/terraform apply
+          name: verifying1
+          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
       - run:
           name: verifying2
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
+          command: ls 
+
+      - run:
+          name: "Apply changes"
+          command: scripts/terraform apply && ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks && ls 
 
 workflows:
   validate_and_plan:
