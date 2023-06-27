@@ -8,6 +8,15 @@ executors:
 orbs:
   terraform: circleci/terraform@3.0.0
 
+commands:
+  set_pull_request_branch:
+    steps:
+      - run:
+          name: Getting target branch
+          command: |
+            # Default branch to avoid issues.
+            target_branch="master"
+            echo "export LG_PR_TARGET=$target_branch" >> "$BASH_ENV"
 jobs:
 
   validate:
