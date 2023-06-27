@@ -48,7 +48,7 @@ jobs:
             terraform plan -out=tfplan
 
       - run:
-          name: Plan and apply Terraform changes
+          name: Apply Terraform changes
           command: |
             terraform apply tfplan
 
@@ -59,6 +59,10 @@ jobs:
       - run:
           name: verifying2
           command: ls lambdas_code/dms_stop_tasks
+
+      - run:
+          name: verifying3
+          command: ls lambdas_code/dms_stop_tasks/code
 workflows:
   build:
     jobs:
