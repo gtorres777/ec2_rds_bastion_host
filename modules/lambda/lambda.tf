@@ -2,8 +2,8 @@ data "archive_file" "lambda_code" {
   type        = "zip"
   # source_dir  = "${path.module}/read_function_code"
   # output_path = "${path.module}/read_function_code.zip"
-  source_dir = var.source_dir
-  output_path = var.output_path
+  source_dir = "${var.absolute_path}${var.source_dir}"
+  output_path = "${var.absolute_path}${var.output_path}"
 }
 data "aws_iam_policy_document" "assume_role" {
   statement {
