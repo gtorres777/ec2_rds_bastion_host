@@ -43,12 +43,15 @@ jobs:
 
       - run:
           name: Generate Lambda code ZIP
-          command: terraform apply -target=data.archive_file.lambda_code && ls /home/circleci/project/lambdas_code/dms_stop_tasks && pwd
+          command: terraform apply -target=data.archive_file.lambda_code && ls lambdas_code/dms_stop_tasks && pwd
 
       - run:
           name: verifying
-          command: ls /home/circleci/project/lambdas_code/dms_stop_tasks && ls lambdas_code/dms_stop_tasks/ && unzip /home/circleci/project/lambdas_code/dms_stop_tasks/code.zip && ls /home/circleci/project/lambdas_code/dms_stop_tasks
+          command: unzip lambdas_code/dms_stop_tasks/code.zip
 
+      - run:
+          name: verifying2
+          command: ls lambdas_code/dms_stop_tasks
 
       # Plan and apply Terraform changes
       - run:
