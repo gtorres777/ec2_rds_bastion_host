@@ -43,7 +43,7 @@ jobs:
 
       - run:
           name: Generate Lambda code ZIP
-          command: terraform apply -target=data.archive_file.lambda_code && ls /lambdas_code/dms_stop_tasks && pwd
+          command: terraform apply -target=data.archive_file.lambda_code && ls && pwd
 
       # Plan and apply Terraform changes
       - run:
