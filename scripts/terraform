@@ -1,0 +1,123 @@
+#!/bin/bash
+
+set -e
+
+pushd () {
+    if [ ${DEBUG:-0} -eq 1 ]; then
+        command pushd "$@"
+    else
+        command pushd "$@" > /dev/null
+    fi
+}
+
+popd () {
+    if [ ${DEBUG:-0} -eq 1 ]; then
+        command popd "$@"
+    else
+        command popd "$@" > /dev/null
+    fi
+}
+TERRABIN=$(which terraform)
+echo "> $TERRABIN"
+BRANCH=${CIRCLE_BRANCH}
+
+function error_handler()
+{
+    if [ $1 -gt 0 ]; then
+      local last_status_code=$1;
+      local error_bash_source=$2;
+      local error_line_number=$3;
+      local command=$4;
+      echo 1>&2 "Error: '$command' exited with status $last_status_code at line $error_line_number";
+    fi
+}
+
+trap 'error_handler $? "${BASH_SOURCE}" "$LINENO" "$BASH_COMMAND"' EXIT
+
+# Function to determine the branch to use for plan & apply with terraform
+# It uses the environment variables CIRCLE_BRANCH and LG_PR_TARGET
+# Look at .circleci/config.yml for LG_PR_TARGET and his definition.
+function _get_branch() {
+  project=$1
+
+  case $CIRCLE_BRANCH in
+    "master" | "staging" | "production")
+      if [ -d "${project}${CIRCLE_BRANCH}" ] &&
+         [ -f "${project}${CIRCLE_BRANCH}/terraform.tfvars" ] &&
+         [ -f "${project}${CIRCLE_BRANCH}/backend.conf" ]; then
+        echo $CIRCLE_BRANCH
+        return
+      else
+        echo "SKIP"
+        return
+      fi
+      ;;
+    *)
+      [ ! -d "${project}${LG_PR_TARGET}" ] && echo "master" && return
+      echo $LG_PR_TARGET
+      ;;
+  esac
+}
+
+# This function is a wrapper around terraform binary to execute additional
+# steps before passing the params to the real terraform.
+function _terraform() {
+    [ ! -d environments ] && echo "No environments" && exit 1
+    pushd environments
+    # where d is the project inside environments,
+    for project in */ ; do
+        # Validations
+        [ -L "${project%/}" ] && echo "${project%/} its a link" && continue
+        [ -z "${project}" ] && echo "${project} empty" && continue
+
+        # Get real branch.
+        BRANCH=$(_get_branch $project)
+        if [ "$BRANCH" == "SKIP" ]; then 
+          continue
+        fi
+        echo "> $LG_PR_TARGET target"
+        echo "> $1 on ${project} branch ${BRANCH}"
+        pushd ${project}
+        ARGS=$(echo "$@" | sed "s/BRANCH/$BRANCH/") 
+        pwd
+        ACTION=$(echo $ARGS | cut -d " " -f1)
+        echo $ARGS
+        ${TERRABIN} ${ARGS}
+        popd
+    done
+    popd
+}
+
+if [ -z "$1" ]; then
+  echo "No instruction was given."
+  exit 1
+fi
+
+set -u 
+
+case "$1" in
+
+  "init")
+    _terraform init -backend-config=BRANCH/backend.conf
+    _terraform fmt
+    _terraform validate
+    ;;
+
+  "plan")
+    _terraform plan -out=tfplan -var-file=terraform.tfvars -var-file=BRANCH/terraform.tfvars
+    ;;
+
+  "apply")
+    _terraform apply tfplan 
+    ;;
+
+  "destroy")
+    _terraform apply -destroy -var-file=terraform.tfvars -var-file=BRANCH/terraform.tfvars
+    ;;
+  *)
+    echo "No instruction was given."
+    exit 1
+    ;;
+esac
+
+echo "Finished Job."
