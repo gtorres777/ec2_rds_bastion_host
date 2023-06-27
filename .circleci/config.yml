@@ -41,6 +41,10 @@ jobs:
           command: |
             terraform validate
 
+      - run:
+          name: Generate Lambda code ZIP
+          command: terraform apply -target=data.archive_file.lambda_code && ls 
+
       # Plan and apply Terraform changes
       - run:
           name: Plan and apply Terraform changes
