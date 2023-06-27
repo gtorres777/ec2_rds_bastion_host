@@ -41,9 +41,11 @@ jobs:
           command: |
             terraform validate
 
+      # Plan and apply Terraform changes
       - run:
-          name: Generate Lambda code ZIP
-          command: terraform apply -target=data.archive_file.lambda_code && ls lambdas_code/dms_stop_tasks && pwd
+          name: Plan and apply Terraform changes
+          command: |
+            terraform apply tfplan
 
       - run:
           name: verifying
@@ -52,14 +54,6 @@ jobs:
       - run:
           name: verifying2
           command: ls lambdas_code/dms_stop_tasks
-
-      # Plan and apply Terraform changes
-      - run:
-          name: Plan and apply Terraform changes
-          command: |
-            terraform plan -out=tfplan
-            terraform apply tfplan
-
 workflows:
   build:
     jobs:
