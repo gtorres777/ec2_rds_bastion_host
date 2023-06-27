@@ -6,7 +6,6 @@ executors:
       - image: cimg/base:current-20.04
 jobs:
   build:
-
     executor: ubuntu-executor
 
     steps:
