@@ -2,18 +2,20 @@ resource "aws_cloudwatch_event_rule" "console" {
   name        = "capture-freeablememory"
   description = "stop dms task"
 
-  event_pattern = jsonencode({
-    "source": ["aws.cloudwatch"],
-    "detail-type": ["CloudWatch Alarm State Change"],
-    "resources": ["arn:aws:cloudwatch:us-east-1:111355452311:alarm:awsrds-premiere-prod-Low-Freeable-Memory"]
-    # "detail": {
-    #     "state": {
-    #         "value": [
-    #             "ALARM"
-    #         ]
-    #     }
-    # }
-  })
+  # event_pattern = jsonencode({
+  #   "source": ["aws.cloudwatch"],
+  #   "detail-type": ["CloudWatch Alarm State Change"],
+  #   "resources": ["arn:aws:cloudwatch:us-east-1:111355452311:alarm:awsrds-premiere-prod-Low-Freeable-Memory"]
+  #   # "detail": {
+  #   #     "state": {
+  #   #         "value": [
+  #   #             "ALARM"
+  #   #         ]
+  #   #     }
+  #   # }
+  # })
+
+  event_pattern = var.event_pattern
 }
 
 resource "aws_cloudwatch_event_target" "lambda" {

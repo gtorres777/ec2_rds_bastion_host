@@ -5,3 +5,7 @@ variable "target_arn" {
 variable "lambda_name" {
   type        = string
 }
+
+variable "event_pattern" {
+  type        = string
+}
