@@ -89,6 +89,9 @@ workflows:
   validate_and_plan:
     jobs:
       - validate
+      - plan:
+          requires:
+            - validate
 
 #   build:
 #     executor: ubuntu-executor
