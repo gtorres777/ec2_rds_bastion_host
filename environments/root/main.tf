@@ -1,5 +1,5 @@
 module "lambda-dms-stop-tasks" {
-  source = "./modules/lambda"
+  source = "../../modules/lambda"
 
   source_dir = "lambdas_code/dms_stop_tasks/code"
   output_path = "lambdas_code/dms_stop_tasks/code.zip"
