@@ -39,7 +39,7 @@ resource "aws_iam_role_policy_attachment" "readLambda_policy" {
 
 resource "aws_lambda_function" "lambda_function" {
   function_name    = var.lambda_function_name
-  filename         = "lambdas_code/${var.filename}"
+  filename         = "${var.absolute_path}/lambdas_code/${var.filename}"
   # runtime          = "nodejs14.x"
   runtime          = var.runtime
   # handler          = "index.handler"
