@@ -40,6 +40,7 @@ jobs:
             echo 'export AWS_SECRET_ACCESS_KEY=OlyesaHHHETNA611NjxfmVXSPD8OaBPPD0donE9U' >> $BASH_ENV
             source $BASH_ENV
       - checkout
+      - set_pull_request_branch
       - run:
           name: "Initialize resources"
           command: ./scripts/terraform init
