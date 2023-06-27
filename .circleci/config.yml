@@ -45,6 +45,11 @@ jobs:
       - run:
           name: Plan and apply Terraform changes
           command: |
+            terraform plan -out=tfplan
+
+      - run:
+          name: Plan and apply Terraform changes
+          command: |
             terraform apply tfplan
 
       - run:
