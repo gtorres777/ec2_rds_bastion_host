@@ -120,7 +120,7 @@ jobs:
 
       - run:
           name: verifying4
-          command: ls lambdas_code/dms_stop_tasks
+          command: ls environments/root/lambdas_code/dms_stop_tasks
 
       - run:
           name: "Apply changes"
