@@ -81,9 +81,6 @@ jobs:
           name: "Plan changes"
           command: ./scripts/terraform plan
 
-      - run:
-          name: verifying3
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
       - persist_to_workspace:
           root: .
@@ -115,20 +112,8 @@ jobs:
             source $BASH_ENV
 
       - run:
-          name: verifying3
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
-
-      - run:
-          name: verifying4
-          command: ls environments/root/lambdas_code/dms_stop_tasks
-
-      - run:
           name: "Apply changes"
           command: scripts/terraform apply  
-
-      - run:
-          name: verifying3
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
 
 workflows:
