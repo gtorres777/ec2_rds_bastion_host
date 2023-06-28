@@ -81,12 +81,15 @@ jobs:
           name: "Plan changes"
           command: ./scripts/terraform plan
 
+      - run:
+          name: verifying2
+          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
       - persist_to_workspace:
           root: .
           paths:
             - environments/*/tfplan
-            - environments/root/lambdas_code/dms_stop_tasks/code.zip
+            - environments/*/lambdas_code/*
 
   apply:
     executor: ubuntu-executor
@@ -110,6 +113,10 @@ jobs:
             echo 'export AWS_ACCESS_KEY_ID=AKIART3KNLOLR4AWBXLW' >> $BASH_ENV
             echo 'export AWS_SECRET_ACCESS_KEY=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' >> $BASH_ENV
             source $BASH_ENV
+
+      - run:
+          name: verifying2
+          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
       - run:
           name: "Apply changes"
@@ -153,6 +160,9 @@ workflows:
       - apply:
           requires:
             - plan
+      - destroy:
+          requires:
+            - apply
 
 #   build:
 #     executor: ubuntu-executor
