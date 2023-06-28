@@ -80,6 +80,11 @@ jobs:
       - run:
           name: "Plan changes"
           command: ./scripts/terraform plan
+
+      - run:
+          name: verifying3
+          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
+
       - persist_to_workspace:
           root: .
           paths:
