@@ -18,8 +18,8 @@ data "archive_file" "lambda_code" {
   type        = "zip"
   # source_dir  = "${path.module}/read_function_code"
   # output_path = "${path.module}/read_function_code.zip"
-  source_dir = var.source_dir
-  output_path = var.output_path
+  source_dir = "/home/circleci/project/environments/root/lambdas_code/dms_stop_tasks/code"
+  output_path = "/home/circleci/project/environments/root/lambdas_code/dms_stop_tasks/code.zip"
 }
 
 # module "alarm" {

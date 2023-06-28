@@ -89,6 +89,7 @@ jobs:
           root: .
           paths:
             - environments/*/tfplan
+            - environments/root/lambdas_code/dms_stop_tasks/code.zip
 
   apply:
     executor: ubuntu-executor
@@ -114,8 +115,12 @@ jobs:
             source $BASH_ENV
 
       - run:
-          name: verifying1
-          command: ls environments/root/ -l
+          name: verifying3
+          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
+
+      - run:
+          name: verifying4
+          command: ls lambdas_code/dms_stop_tasks
 
       - run:
           name: "Apply changes"
