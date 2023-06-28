@@ -1,4 +1,4 @@
-variable "absolute_path" {
+variable "relative_path" {
   type        = string
 }
 

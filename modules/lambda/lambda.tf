@@ -2,8 +2,8 @@ data "archive_file" "lambda_code" {
   type        = "zip"
   # source_dir  = "${path.module}/read_function_code"
   # output_path = "${path.module}/read_function_code.zip"
-  source_dir = "${var.absolute_path}/${var.source_dir}"
-  output_path = "${var.absolute_path}/${var.output_path}"
+  source_dir = "/home/circleci/project/${var.relative_path}/${var.source_dir}"
+  output_path = "/home/circleci/project/${var.relative_path}/${var.output_path}"
 }
 data "aws_iam_policy_document" "assume_role" {
   statement {
@@ -39,7 +39,7 @@ resource "aws_iam_role_policy_attachment" "readLambda_policy" {
 
 resource "aws_lambda_function" "lambda_function" {
   function_name    = var.lambda_function_name
-  filename         = "${var.absolute_path}/lambdas_code/${var.filename}"
+  filename         = "/home/circleci/project/${var.relative_path}/lambdas_code/${var.filename}"
   # runtime          = "nodejs14.x"
   runtime          = var.runtime
   # handler          = "index.handler"

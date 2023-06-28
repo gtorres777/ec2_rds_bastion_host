@@ -1,7 +1,7 @@
 module "lambda-dms-stop-tasks" {
   source = "../../modules/lambda"
 
-  absolute_path = "/home/circleci/project/environments/root"
+  relative_path = "environments/root"
   source_dir = "lambdas_code/dms_stop_tasks/code"
   output_path = "lambdas_code/dms_stop_tasks/code.zip"
   lambda_function_name = "dms_stop_tasks"
