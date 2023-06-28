@@ -115,20 +115,46 @@ jobs:
           name: "Apply changes"
           command: scripts/terraform apply  
 
-      # - run:
-      #     name: "Destroy changes"
-      #     command: scripts/terraform destroy  
+  destroy:
+    executor: ubuntu-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - set_pull_request_branch
+      - run:
+          name: Install Terraform
+          command: |
+            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+            sudo mv terraform /usr/local/bin/
+            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+
+      # Configure AWS credentials
+      - run:
+          name: Configure AWS credentials
+          command: |
+            echo 'export AWS_ACCESS_KEY_ID=AKIART3KNLOLR4AWBXLW' >> $BASH_ENV
+            echo 'export AWS_SECRET_ACCESS_KEY=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' >> $BASH_ENV
+            source $BASH_ENV
+
+      - run:
+          name: "destroy changes"
+          command: scripts/terraform destroy  
+
 
 workflows:
   validate_and_plan:
     jobs:
       - validate
-      - plan:
-          requires:
-            - validate
-      - apply:
-          requires:
-            - plan
+      - plan
+      - destroy
+      # - plan:
+      #     requires:
+      #       - validate
+      # - apply:
+      #     requires:
+      #       - plan
 
 #   build:
 #     executor: ubuntu-executor
