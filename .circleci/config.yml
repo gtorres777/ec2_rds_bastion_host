@@ -109,35 +109,20 @@ jobs:
             source $BASH_ENV
       - run:
           name: verifying1
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
-
-      # - run:
-      #     name: zip generating
-      #     command: scripts/terraform apply -target=data.archive_file 
+          command: ls -l
 
       - run:
           name: verifying1
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
+          command: ls environments/root/ -l
 
       - run:
           name: "Apply changes"
-          command: scripts/terraform apply && ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks && ls 
+          command: scripts/terraform apply  
 
       - run:
           name: verifying3
-          command: ls environments
+          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
-      - run:
-          name: verifying4
-          command: ls modules
-
-      - run:
-          name: verifying4
-          command: ls modules/lambda
-
-      - run:
-          name: verifying4
-          command: ls environments/root
 
 workflows:
   validate_and_plan:
