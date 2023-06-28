@@ -107,9 +107,6 @@ jobs:
             echo 'export AWS_ACCESS_KEY_ID=AKIART3KNLOLR4AWBXLW' >> $BASH_ENV
             echo 'export AWS_SECRET_ACCESS_KEY=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' >> $BASH_ENV
             source $BASH_ENV
-      - run:
-          name: verifying1
-          command: ls -l
 
       - run:
           name: verifying1

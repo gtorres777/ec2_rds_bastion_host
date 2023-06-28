@@ -22,16 +22,16 @@ data "archive_file" "lambda_code" {
   output_path = "/home/circleci/project/environments/root/lambdas_code/dms_stop_tasks/code.zip"
 }
 
-module "alarm" {
-  source = "../../modules/alarms"
+# module "alarm" {
+#   source = "../../modules/alarms"
 
-  alarm_name                = "awsrds-premiere-prod-Low-Freeable-Memory"
-  comparison_operator       = "LessThanOrEqualToThreshold"
-  evaluation_periods        = 1
-  metric_name               = "FreeableMemory"
-  namespace                 = "AWS/RDS"
-  period                    = 300
-  statistic                 = "Average"
-  # threshold                 = 64424509440.0
-  threshold                 = 173020518
-}
+#   alarm_name                = "awsrds-premiere-prod-Low-Freeable-Memory"
+#   comparison_operator       = "LessThanOrEqualToThreshold"
+#   evaluation_periods        = 1
+#   metric_name               = "FreeableMemory"
+#   namespace                 = "AWS/RDS"
+#   period                    = 300
+#   statistic                 = "Average"
+#   # threshold                 = 64424509440.0
+#   threshold                 = 173020518
+# }
