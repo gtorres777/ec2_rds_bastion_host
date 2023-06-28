@@ -112,8 +112,12 @@ jobs:
           command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
       - run:
-          name: verifying2
-          command: ls 
+          name: zip generating
+          command: scripts/terraform apply -target=data.archive_file 
+
+      - run:
+          name: verifying1
+          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
       - run:
           name: "Apply changes"
