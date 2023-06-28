@@ -108,7 +108,7 @@ case "$1" in
     ;;
 
   "apply")
-    _terraform apply tfplan 
+    _terraform apply tfplan -target=data.archive_file 
     ;;
 
   "destroy")
