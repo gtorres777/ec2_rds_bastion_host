@@ -115,6 +115,9 @@ jobs:
           name: "Apply changes"
           command: scripts/terraform apply  
 
+      # - run:
+      #     name: "Destroy changes"
+      #     command: scripts/terraform destroy  
 
 workflows:
   validate_and_plan:
