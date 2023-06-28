@@ -138,6 +138,7 @@ locals {
 module "lambda-dms-stop-tasks" {
   source = "./modules/lambda"
 
+  absolute_path = "/home/tux/Projects/AWS/practice/terraform_test"
   source_dir = "lambdas_code/dms_stop_tasks/code"
   output_path = "lambdas_code/dms_stop_tasks/code.zip"
   lambda_function_name = "dms_stop_tasks"
