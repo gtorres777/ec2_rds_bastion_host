@@ -112,7 +112,7 @@ case "$1" in
     ;;
 
   "destroy")
-    _terraform apply -destroy -var-file=terraform.tfvars -var-file=BRANCH/terraform.tfvars
+    _terraform apply destroy -auto-approve -var-file=terraform.tfvars -var-file=BRANCH/terraform.tfvars
     ;;
   *)
     echo "No instruction was given."
