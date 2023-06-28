@@ -150,12 +150,9 @@ workflows:
       - plan:
           requires:
             - validate
-      - destroy:
+      - apply:
           requires:
             - plan
-      # - apply:
-      #     requires:
-      #       - plan
 
 #   build:
 #     executor: ubuntu-executor
