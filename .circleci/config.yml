@@ -119,6 +119,22 @@ jobs:
           name: "Apply changes"
           command: scripts/terraform apply && ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks && ls 
 
+      - run:
+          name: verifying3
+          command: ls environments
+
+      - run:
+          name: verifying4
+          command: ls modules
+
+      - run:
+          name: verifying4
+          command: ls modules/lambda
+
+      - run:
+          name: verifying4
+          command: ls environments/root
+
 workflows:
   validate_and_plan:
     jobs:
