@@ -147,11 +147,12 @@ workflows:
   validate_and_plan:
     jobs:
       - validate
-      - plan
-      - destroy
-      # - plan:
-      #     requires:
-      #       - validate
+      - plan:
+          requires:
+            - validate
+      - destroy:
+          requires:
+            - plan
       # - apply:
       #     requires:
       #       - plan
