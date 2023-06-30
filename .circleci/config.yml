@@ -41,22 +41,7 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: |
-            '
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "*This is a text notification*",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
-            '
+            <%= File.read('.circleci/templates/basic_success.json').inspect %>
 
 jobs:
 
