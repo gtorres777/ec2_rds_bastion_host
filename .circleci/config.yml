@@ -34,7 +34,7 @@ commands:
 
       - run:
           name: Include JSON file
-          command: ls .circleci
+          command: cat .circleci/templates/basic_success.json
       # - run:
       #     name: Include JSON file
       #     command: |
@@ -46,20 +46,7 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: | 
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "*This is a text notification*",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
+            "$(cat .circleci/templates/basic_success.json)" 
 
 jobs:
 
