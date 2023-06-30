@@ -38,7 +38,7 @@ commands:
       - run:
           name: Include JSON file
           command: |
-            CONTENT=$(cat /home/circleci/project/.circleci/templates/basic_succes.json | sed -e 's/^/  /')
+            CONTENT=$(cat .circleci/templates/basic_success.json | sed -e 's/^/  /')
             echo "custom:" > included_file.yml
             echo "$CONTENT" >> included_file.yml
       - slack/notify:
