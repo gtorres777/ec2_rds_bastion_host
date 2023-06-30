@@ -34,7 +34,7 @@ commands:
 
       - run:
           name: Include JSON file
-          command: cat .circleci/templates/basic_success.json >> 
+          command: cat .circleci/templates/basic_success.json 
       - run:
           name: Set Environment Variable
           command: cat .circleci/templates/basic_success.json >> $SLACK_PARAM_CUSTOM
