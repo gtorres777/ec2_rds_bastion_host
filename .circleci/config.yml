@@ -42,7 +42,7 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: > 
-            $BLOCK_KIT
+            '$BLOCK_KIT'
           # custom: |
           #   {
           #     "blocks": [
