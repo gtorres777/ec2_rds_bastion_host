@@ -29,8 +29,10 @@ commands:
   notify_slack_pass:
     steps:
       - run:
-          name: Commit message
-          command: ls
+          name: Print Commit Message
+          command: |
+            commit_message=$(git log --format=%B -n 1 $CIRCLE_SHA1)
+            echo "Commit Message: $commit_message"
 
       - slack/notify:
           branch_pattern: "master|staging|production"
@@ -73,7 +75,7 @@ commands:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Commit Message*: $CIRCLE_SHA1"
+                      "text": "*Commit Message*: $commit_message"
                     },
                     {
                       "type": "mrkdwn",
