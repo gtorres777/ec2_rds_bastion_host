@@ -29,17 +29,8 @@ commands:
   notify_slack_pass:
     steps:
       - run:
-          name: Include JSON file
+          name: Commit message
           command: ls
-
-      - run:
-          name: Include JSON file
-          command: cat .circleci/templates/basic_success.json 
-      - run:
-          name: Set Environment Variable
-          command: |
-            export FILE_CONTENT="$(cat .circleci/templates/basic_success.json)"
-            echo "FILE_CONTENT=$FILE_CONTENT" >> $SLACK_PARAM_CUSTOM
 
       - slack/notify:
           branch_pattern: "master|staging|production"
