@@ -75,7 +75,7 @@ commands:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Commit Message*: $commit_message"
+                      "text": "*Commit Message*: ${commit_message}"
                     },
                     {
                       "type": "mrkdwn",
