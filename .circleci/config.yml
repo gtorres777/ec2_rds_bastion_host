@@ -32,7 +32,7 @@ commands:
           branch_pattern: "master|staging|production"
           event: pass
           channel: $SLACK_CHANNEL
-          template: basic_success_1
+          custom: !include basic_succes.json
 
 jobs:
 
