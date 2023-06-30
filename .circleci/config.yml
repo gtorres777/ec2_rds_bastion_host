@@ -37,7 +37,9 @@ commands:
           command: cat .circleci/templates/basic_success.json 
       - run:
           name: Set Environment Variable
-          command: cat .circleci/templates/basic_success.json >> $SLACK_PARAM_CUSTOM
+          command: |
+            export FILE_CONTENT="$(cat .circleci/templates/basic_success.json)"
+            echo "FILE_CONTENT=$FILE_CONTENT" >> $SLACK_PARAM_CUSTOM
 
       - slack/notify:
           branch_pattern: "master|staging|production"
