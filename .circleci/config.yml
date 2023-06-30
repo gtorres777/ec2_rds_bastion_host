@@ -34,18 +34,14 @@ commands:
 
       - run:
           name: Include JSON file
-          command: ls .circleci
-      - run:
-          name: Include JSON file
-          command: |
-            CONTENT=$(cat .circleci/templates/basic_success.json | sed -e 's/^/  /')
-            echo "custom:" > included_file.yml
-            echo "$CONTENT" >> included_file.yml
+          command: cat .circleci/templates/basic_success.json
+
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: pass
           channel: $SLACK_CHANNEL
-          custom: "$(cat included_file.yml)" 
+          custom: |
+            bash -c 'cat .circleci/templates/basic_success.json'
 
 jobs:
 
