@@ -31,8 +31,8 @@ commands:
       - run:
           name: Print Commit Message
           command: |
-            commit_message=$(git log --format=%B -n 1 $CIRCLE_SHA1)
-            echo "Commit Message: $commit_message"
+            export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)
+            echo "Commit Message: $COMMIT_MESSAGE"
 
       - slack/notify:
           branch_pattern: "master|staging|production"
@@ -75,7 +75,7 @@ commands:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Commit Message*: ${commit_message}"
+                      "text": "*Commit Message*: $COMMIT_MESSAGE"
                     },
                     {
                       "type": "mrkdwn",
