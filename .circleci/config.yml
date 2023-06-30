@@ -41,7 +41,7 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: |
-            bash -c 'cat .circleci/templates/basic_success.json'
+            bash -c 'echo "$BASIC_SUCCESS"'
 
 jobs:
 
