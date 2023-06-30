@@ -32,7 +32,8 @@ commands:
           branch_pattern: "master|staging|production"
           event: pass
           channel: $SLACK_CHANNEL
-          custom: !include basic_succes.json
+          custom: !!str |-
+            <<< $(yq e '.custom' basic_succes.json)
 
 jobs:
 
