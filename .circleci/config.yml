@@ -34,14 +34,18 @@ commands:
 
       - run:
           name: Include JSON file
-          command: cat .circleci/templates/basic_success.json
+          command: cat .circleci/templates/basic_success.json >> 
+      - run:
+          name: Set Environment Variable
+          command: |
+            export FILE_CONTENT="$(cat .circleci/templates/basic_success.json)"
+            echo "FILE_CONTENT=$FILE_CONTENT" >> $SLACK_PARAM_CUSTOM
 
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: pass
           channel: $SLACK_CHANNEL
-          custom: <%= File.read('.circleci/templates/basic_success.json').inspect %>
-
+          custom: |
 jobs:
 
   validate:
