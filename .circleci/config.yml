@@ -40,8 +40,7 @@ commands:
           branch_pattern: "master|staging|production"
           event: pass
           channel: $SLACK_CHANNEL
-          custom: |
-            <%= File.read('.circleci/templates/basic_success.json').inspect %>
+          custom: <%= File.read('.circleci/templates/basic_success.json').inspect %>
 
 jobs:
 
