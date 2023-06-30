@@ -46,7 +46,9 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: | 
-            $(cat .circleci/templates/basic_success.json)
+            $BASIC_SUCCESS
+          # custom: | 
+          #   $(cat .circleci/templates/basic_success.json)
 
 jobs:
 
