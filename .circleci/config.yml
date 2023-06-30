@@ -41,6 +41,7 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: |
+            "
             {
               "blocks": [
                 {
@@ -55,6 +56,7 @@ commands:
                 }
               ]
             }
+            "
 
 jobs:
 
