@@ -30,6 +30,13 @@ commands:
     steps:
       - run:
           name: Include JSON file
+          command: ls
+
+      - run:
+          name: Include JSON file
+          command: ls .circleci
+      - run:
+          name: Include JSON file
           command: |
             CONTENT=$(cat /home/circleci/project/.circleci/templates/basic_succes.json | sed -e 's/^/  /')
             echo "custom:" > included_file.yml
@@ -45,38 +52,38 @@ jobs:
   validate:
     executor: ubuntu-executor
     steps:
-      # Install Terraform
-      - run:
-          name: Install Terraform
-          command: |
-            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            sudo mv terraform /usr/local/bin/
-            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+      # # Install Terraform
+      # - run:
+      #     name: Install Terraform
+      #     command: |
+      #       TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+      #       curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+      #       unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+      #       sudo mv terraform /usr/local/bin/
+      #       rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
-      # Configure AWS credentials
-      - run:
-          name: Configure AWS credentials
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
-      - checkout
-      - set_pull_request_branch
-      - run:
-          name: "Initialize resources"
-          command: ./scripts/terraform init
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .terraform
-            - .terraform.lock.hcl
-            - environments
-            - modules
-            - scripts
-            - shared
-            - tfstates
+      # # Configure AWS credentials
+      # - run:
+      #     name: Configure AWS credentials
+      #     command: |
+      #       echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+      #       echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+      #       source $BASH_ENV
+      # - checkout
+      # - set_pull_request_branch
+      # - run:
+      #     name: "Initialize resources"
+      #     command: ./scripts/terraform init
+      # - persist_to_workspace:
+      #     root: .
+      #     paths:
+      #       - .terraform
+      #       - .terraform.lock.hcl
+      #       - environments
+      #       - modules
+      #       - scripts
+      #       - shared
+      #       - tfstates
       - notify_slack_error
       - notify_slack_pass
 
