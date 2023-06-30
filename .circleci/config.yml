@@ -46,7 +46,20 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: | 
-            "$(cat .circleci/templates/basic_success.json)" 
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*This is a text notification*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
 
 jobs:
 
