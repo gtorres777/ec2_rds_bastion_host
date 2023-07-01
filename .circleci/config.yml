@@ -37,6 +37,14 @@ commands:
             echo "BLOCK_KIT=$(cat .circleci/templates/basic_success.json)" >> $BASH_ENV
             echo "Commit Message: $BLOCK_KIT"
 
+      - run:
+          name: Print2 Commit Message
+          command: |
+            echo $COMMIT_MESSAGE
+
+            echo "---------------"
+            echo $BLOCK_KIT
+
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: pass
