@@ -54,8 +54,8 @@ commands:
           branch_pattern: "master|staging|production"
           event: pass
           channel: $SLACK_CHANNEL
-          custom: !!str |-
-            <<< $(yq eval '.' basic_success.json)
+          custom: !!str |
+            $(yq eval '.' basic_success.json)
 
           # custom: !!str |-
           #   $(cat .circleci/templates/basic_succes.json)
