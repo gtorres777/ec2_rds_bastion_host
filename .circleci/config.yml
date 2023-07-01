@@ -55,10 +55,11 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: !!str |-
-            $(cat .circleci/templates/basic_succes.json)
+            <<< $(yq eval '.' basic_success.json)
 
           # custom: !!str |-
-          #   <<< $(yq e '.custom' .circleci/templates/basic_succes.json)
+          #   $(cat .circleci/templates/basic_succes.json)
+
 
           # custom: $BLOCK_KIT
           # custom: |
