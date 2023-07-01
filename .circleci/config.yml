@@ -34,14 +34,8 @@ commands:
             echo "COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)" >> $BASH_ENV
             echo "Commit Message: $COMMIT_MESSAGE"
 
-            echo 'BLOCK_KIT=$(cat .circleci/templates/basic_success.json)' >> $BASH_ENV
-            echo "Block Kit: $BLOCK_KIT"
-
-      - run:
-          name: Print Commit Message
-          command: |
-            echo "Block Kit: $BLOCK_KIT"
-            echo $BLOCK_KIT
+            echo "BLOCK_KIT=$(cat .circleci/templates/basic_success.json)" >> $BASH_ENV
+            echo "Commit Message: $BLOCK_KIT"
 
       - slack/notify:
           branch_pattern: "master|staging|production"
