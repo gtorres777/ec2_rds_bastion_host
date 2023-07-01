@@ -55,7 +55,7 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: !!str |
-            $(yq eval '.' basic_success.json)
+            $(yq eval '.' .circleci/templates/basic_succes.json)
 
           # custom: !!str |-
           #   $(cat .circleci/templates/basic_succes.json)
