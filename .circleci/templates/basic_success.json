@@ -1,14 +1,14 @@
-"{
-  "blocks": [
+{
+  \"blocks\": [
     {
-      "type": "section",
-      "fields": [
+      \"type\": \"section\",
+      \"fields\": [
         {
-          "type": "plain_text",
-          "text": "*This is a text notification*",
-          "emoji": true
+          \"type\": \"plain_text\",
+          \"text\": \"*This is a text notification*\",
+          \"emoji\": true
         }
       ]
     }
   ]
-}"
+}
