@@ -177,7 +177,7 @@ commands:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Mentions*: $CIRCLE_USERNAME"
+                      "text": "*Mentions*: ${SLACK_PARAM_MENTIONS}"
                     }
                   ]
                 },
