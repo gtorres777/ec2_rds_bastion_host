@@ -727,6 +727,11 @@ jobs:
                 step_name: <<parameters.step_name>>
                 template: <<parameters.template>>
 
+workflows:
+  validate_and_plan:
+    jobs:
+      - on-hold
+
 # version: 2.1
 
 # executors:
