@@ -744,7 +744,7 @@ workflows:
   validate_and_plan:
     jobs:
       - on-hold:
-        custom: $BLOCK_KIT
+          custom: '${BLOCK_KIT}'
 
 # version: 2.1
 
