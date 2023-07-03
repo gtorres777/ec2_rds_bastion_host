@@ -132,7 +132,11 @@ commands:
                                 echo "$SLACK_PARAM_CUSTOM"
                                 ModifyCustomTemplate
                                 # shellcheck disable=SC2016
+                                echo "CUSTOM MODIFIED1"
+                                echo $CUSTOM_BODY_MODIFIED
                                 CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
+                                echo "CUSTOM MODIFIED2"
+                                echo $CUSTOM_BODY_MODIFIED
                                 T2="$(eval printf '%s' \""$CUSTOM_BODY_MODIFIED"\")"
                             else
                                 # shellcheck disable=SC2154
@@ -194,7 +198,10 @@ commands:
 
                         ModifyCustomTemplate() {
                             # Inserts the required "text" field to the custom json template from block kit builder.
+                            echo "MODIFYTEMPLATE"
+                            echo $SLACK_PARAM_CUSTOM
                             if [ "$(echo "$SLACK_PARAM_CUSTOM" | jq '.text')" = "null" ]; then
+                                echo "entro"
                                 CUSTOM_BODY_MODIFIED=$(echo "$SLACK_PARAM_CUSTOM" | jq '. + {"text": ""}')
                             else
                                 # In case the text field was set manually.
