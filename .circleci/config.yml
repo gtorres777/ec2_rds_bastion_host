@@ -732,20 +732,7 @@ workflows:
     jobs:
       - on-hold:
           custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "*This is a text notification*",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
+            $BLOCK_KIT
 
 # version: 2.1
 
