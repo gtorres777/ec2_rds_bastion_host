@@ -55,9 +55,7 @@ commands:
           event: pass
           channel: $SLACK_CHANNEL
           custom: |
-            {
               $BLOCK_KIT
-            }
           # custom: !!str |-
           #   $(cat .circleci/templates/basic_succes.json)
 
