@@ -703,6 +703,17 @@ jobs:
                 type: string
         resource_class: small
         steps:
+            - run:
+                name: BLOCKKIT
+                command: |
+                  echo 'export BLOCK_KIT=$(cat .circleci/templates/basic_success.json)' >> $BASH_ENV
+                  source $BASH_ENV
+
+            - run:
+                name: PRINTBLOCK
+                command: |
+                  echo $BLOCK_KIT
+
             - notify:
                 branch_pattern: <<parameters.branch_pattern>>
                 channel: <<parameters.channel>>
