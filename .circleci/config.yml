@@ -54,7 +54,8 @@ commands:
           branch_pattern: "master|staging|production"
           event: pass
           channel: $SLACK_CHANNEL
-          custom: '$BLOCK_KIT'
+          custom: |+
+              $BLOCK_KIT
           # custom: !!str |-
           #   $(cat .circleci/templates/basic_succes.json)
 
