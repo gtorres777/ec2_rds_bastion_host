@@ -743,11 +743,8 @@ jobs:
 workflows:
   validate_and_plan:
     jobs:
-      - run:
-          name: Set Custom Parameter
-          command: |
-            echo "custom: '${CIRCLE_SHA1}'" >> $BASH_ENV
-      - on-hold
+      - on-hold:
+          custom: '${{ env.CIRCLE_SHA1 }}'
 
 # version: 2.1
 
