@@ -869,11 +869,11 @@ jobs:
           #     ]
           #   }
 
-jobs:
+# jobs:
 
-  validate:
-    executor: ubuntu-executor
-    steps:
+#   validate:
+#     executor: ubuntu-executor
+#     steps:
       # # Install Terraform
       # - run:
       #     name: Install Terraform
@@ -906,110 +906,110 @@ jobs:
       #       - scripts
       #       - shared
       #       - tfstates
-      - checkout
-      - notify_slack_error
-      - notify_slack_pass
+  #     - checkout
+  #     - notify_slack_error
+  #     - notify_slack_pass
 
-  plan:
-    executor: ubuntu-executor
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Install Terraform
-          command: |
-            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            sudo mv terraform /usr/local/bin/
-            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  # plan:
+  #   executor: ubuntu-executor
+  #   steps:
+  #     - attach_workspace:
+  #         at: .
+  #     - run:
+  #         name: Install Terraform
+  #         command: |
+  #           TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+  #           curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  #           unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  #           sudo mv terraform /usr/local/bin/
+  #           rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
-      # Configure AWS credentials
-      - run:
-          name: Configure AWS credentials
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
-      - set_pull_request_branch
-      - run:
-          name: "Plan changes"
-          command: ./scripts/terraform plan
+  #     # Configure AWS credentials
+  #     - run:
+  #         name: Configure AWS credentials
+  #         command: |
+  #           echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+  #           echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+  #           source $BASH_ENV
+  #     - set_pull_request_branch
+  #     - run:
+  #         name: "Plan changes"
+  #         command: ./scripts/terraform plan
 
-      - run:
-          name: verifying2
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
+  #     - run:
+  #         name: verifying2
+  #         command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - environments/*/tfplan
-            - environments/*/lambdas_code/*
-            - environments/*/lambdas_test/*
+  #     - persist_to_workspace:
+  #         root: .
+  #         paths:
+  #           - environments/*/tfplan
+  #           - environments/*/lambdas_code/*
+  #           - environments/*/lambdas_test/*
 
-  apply:
-    executor: ubuntu-executor
-    steps:
-      - attach_workspace:
-          at: .
-      - set_pull_request_branch
-      - run:
-          name: Install Terraform
-          command: |
-            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            sudo mv terraform /usr/local/bin/
-            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  # apply:
+  #   executor: ubuntu-executor
+  #   steps:
+  #     - attach_workspace:
+  #         at: .
+  #     - set_pull_request_branch
+  #     - run:
+  #         name: Install Terraform
+  #         command: |
+  #           TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+  #           curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  #           unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  #           sudo mv terraform /usr/local/bin/
+  #           rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
-      # Configure AWS credentials
-      - run:
-          name: Configure AWS credentials
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
+  #     # Configure AWS credentials
+  #     - run:
+  #         name: Configure AWS credentials
+  #         command: |
+  #           echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+  #           echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+  #           source $BASH_ENV
 
-      - run:
-          name: verifying2
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
+  #     - run:
+  #         name: verifying2
+  #         command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
-      - run:
-          name: "Apply changes"
-          command: scripts/terraform apply  
+  #     - run:
+  #         name: "Apply changes"
+  #         command: scripts/terraform apply  
 
-  destroy:
-    executor: ubuntu-executor
-    steps:
-      - attach_workspace:
-          at: .
-      - set_pull_request_branch
-      - run:
-          name: Install Terraform
-          command: |
-            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            sudo mv terraform /usr/local/bin/
-            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  # destroy:
+  #   executor: ubuntu-executor
+  #   steps:
+  #     - attach_workspace:
+  #         at: .
+  #     - set_pull_request_branch
+  #     - run:
+  #         name: Install Terraform
+  #         command: |
+  #           TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+  #           curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  #           unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+  #           sudo mv terraform /usr/local/bin/
+  #           rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
-      # Configure AWS credentials
-      - run:
-          name: Configure AWS credentials
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
+  #     # Configure AWS credentials
+  #     - run:
+  #         name: Configure AWS credentials
+  #         command: |
+  #           echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+  #           echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+  #           source $BASH_ENV
 
-      - run:
-          name: "destroy changes"
-          command: scripts/terraform destroy  
+  #     - run:
+  #         name: "destroy changes"
+  #         command: scripts/terraform destroy  
 
 
-workflows:
-  validate_and_plan:
-    jobs:
-      - validate
+# workflows:
+#   validate_and_plan:
+#     jobs:
+#       - validate
       # - plan:
       #     requires:
       #       - validate
