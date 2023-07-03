@@ -20,16 +20,6 @@ commands:
             echo "export LG_PR_TARGET=$target_branch" >> "$BASH_ENV"
   notify_slack_error:
     steps:
-      - run:
-          name: Set Commit Message
-          command: |
-            echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
-
-      - run:
-          name: Print2 ERROR Commit Message
-          command: |
-            echo $COMMIT_MESSAGE
-
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: fail
@@ -99,11 +89,6 @@ commands:
 
   notify_slack_pass:
     steps:
-      - run:
-          name: Set Commit Message
-          command: |
-            echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
-
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: pass
@@ -209,6 +194,10 @@ jobs:
       #       - shared
       #       - tfstates
       - checkout
+      - run:
+          name: Set Commit Message
+          command: |
+            echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
       - run:
           name: Install Terraform
           command: |
