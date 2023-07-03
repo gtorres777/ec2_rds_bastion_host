@@ -672,21 +672,7 @@ jobs:
                     CircleCI Host (used as the base for the Workflow URL)
                 type: string
             custom:
-                default: |
-                  {
-                    "blocks": [
-                      {
-                        "type": "section",
-                        "fields": [
-                          {
-                            "type": "plain_text",
-                            "text": "*This is a text notification*",
-                            "emoji": true
-                          }
-                        ]
-                      }
-                    ]
-                  }
+                default: ""
                 type: string
             debug:
                 default: false
@@ -732,7 +718,22 @@ jobs:
 workflows:
   validate_and_plan:
     jobs:
-      - on-hold
+      - on-hold:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*This is a text notification*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
 
 # version: 2.1
 
