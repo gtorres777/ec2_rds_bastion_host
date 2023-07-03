@@ -138,6 +138,8 @@ commands:
                                 echo "CUSTOM MODIFIED2"
                                 echo $CUSTOM_BODY_MODIFIED
                                 T2="$(eval printf '%s' \""$CUSTOM_BODY_MODIFIED"\")"
+                                echo "T2 inside"
+                                echo $T2
                             else
                                 # shellcheck disable=SC2154
                                 if [ -n "${SLACK_PARAM_TEMPLATE:-}" ]; then TEMPLATE="\$$SLACK_PARAM_TEMPLATE"
@@ -157,6 +159,8 @@ commands:
 
                             # Insert the default channel. THIS IS TEMPORARY
                             T2="$(printf '%s' "$T2" | jq ". + {\"channel\": \"$SLACK_DEFAULT_CHANNEL\"}")"
+                            echo "T2 outside"
+                            echo $T2
                             SLACK_MSG_BODY="$T2"
                         }
 
