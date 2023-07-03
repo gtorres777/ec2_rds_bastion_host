@@ -154,10 +154,6 @@ commands:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Commit*: $CIRCLE_SHA1"
-                    },
-                    {
-                      "type": "mrkdwn",
                       "text": "*MESSAGE*: $COMMIT_MESSAGE"
                     },
                     {
