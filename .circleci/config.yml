@@ -744,7 +744,7 @@ workflows:
   validate_and_plan:
     jobs:
       - on-hold:
-          custom: '${{ CIRCLE_SHA1 }}'
+          custom: '${{ $CIRCLE_SHA1 }}'
 
 # version: 2.1
 
