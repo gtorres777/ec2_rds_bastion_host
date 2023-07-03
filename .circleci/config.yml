@@ -80,15 +80,6 @@ commands:
                   }
                 },
                 {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Mentions*: $SLACK_PARAM_MENTIONS"
-                    }
-                  ]
-                },
-                {
                   "type": "actions",
                   "elements": [
                     {
@@ -111,18 +102,6 @@ commands:
           name: Set Commit Message
           command: |
             echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
-
-      - run:
-          name: Print2 Commit Message
-          command: |
-            echo $COMMIT_MESSAGE
-
-      - run:
-          name: Print2 Mentions
-          command: |
-            echo "export SLACK_PARAM_MENTIONS='<@Gustavo>'" >> $BASH_ENV
-            echo $SLACK_PARAM_MENTIONS
-
 
       - slack/notify:
           branch_pattern: "master|staging|production"
@@ -173,15 +152,6 @@ commands:
                     "image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
                     "alt_text": "CircleCI logo"
                   }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Mentions*: ${SLACK_PARAM_MENTIONS}"
-                    }
-                  ]
                 },
                 {
                   "type": "actions",
