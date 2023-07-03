@@ -208,6 +208,10 @@ jobs:
       #       - shared
       #       - tfstates
       - checkout
+      - run:
+          name: Install Terraform
+          command: |
+            ls incompr
       - notify_slack_error
       - notify_slack_pass
 
