@@ -729,6 +729,7 @@ jobs:
 workflows:
   validate_and_plan:
     jobs:
+      - checkout
       - on-hold:
           custom: |
             {
