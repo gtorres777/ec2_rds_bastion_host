@@ -25,10 +25,6 @@ commands:
           command: |
             echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
 
-      - run:
-          name: Print2 Commit Message
-          command: |
-            echo $COMMIT_MESSAGE
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: fail
@@ -211,7 +207,7 @@ jobs:
       - run:
           name: Install Terraform
           command: |
-            ls 
+            ls incompr
       - notify_slack_error
       - notify_slack_pass
 
