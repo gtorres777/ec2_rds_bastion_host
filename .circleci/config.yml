@@ -732,7 +732,7 @@ workflows:
     jobs:
       - on-hold:
           custom: |
-            $BLOCK_KIT
+            $CIRCLE_PROJECT_REPONAME
 
 # version: 2.1
 
