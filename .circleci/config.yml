@@ -745,20 +745,7 @@ workflows:
     jobs:
       - on-hold:
           custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "$CIRCLE_SHA1",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
+            $(eval printf '%s' \""$BLOCK_KIT"\")"
 
 # version: 2.1
 
