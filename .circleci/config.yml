@@ -201,7 +201,7 @@ jobs:
       - run:
           name: Install Terraform
           command: |
-            ls incompr
+            ls
       - notify_slack_error
       - notify_slack_pass
 
