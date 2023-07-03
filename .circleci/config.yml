@@ -129,7 +129,7 @@ commands:
                                 echo $SLACK_PARAM_CUSTOM
                                 SanitizeVars "$SLACK_PARAM_CUSTOM"
                                 echo "AFTER SANITIZED"
-                                echo "SLACK_PARAM_CUSTOM"
+                                echo "$SLACK_PARAM_CUSTOM"
                                 ModifyCustomTemplate
                                 # shellcheck disable=SC2016
                                 CUSTOM_BODY_MODIFIED=$(echo "$CUSTOM_BODY_MODIFIED" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed 's/`/\\`/g')
@@ -734,7 +734,20 @@ workflows:
     jobs:
       - on-hold:
           custom: |
-            $CIRCLE_PROJECT_REPONAME
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "$CIRCLE_SHA1",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
 
 # version: 2.1
 
