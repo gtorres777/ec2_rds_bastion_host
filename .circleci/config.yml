@@ -744,12 +744,7 @@ workflows:
   validate_and_plan:
     jobs:
       - on-hold:
-        custom: !!bash/function >
-          |
-          my_function() {
-            cat .circleci/templates/basic_success.json
-          }
-          my_function
+        custom: '${BLOCK_KIT}'
 
 # version: 2.1
 
