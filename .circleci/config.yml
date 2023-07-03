@@ -125,6 +125,8 @@ commands:
                             #   if none is supplied, check for a pre-selected template value.
                             #   If none, error.
                             if [ -n "${SLACK_PARAM_CUSTOM:-}" ]; then
+                                echo "HERE PARAM CUSTOM"
+                                echo $SLACK_PARAM_CUSTOM
                                 SanitizeVars "$SLACK_PARAM_CUSTOM"
                                 ModifyCustomTemplate
                                 # shellcheck disable=SC2016
