@@ -18,12 +18,16 @@ commands:
             # Default branch to avoid issues.
             target_branch="master"
             echo "export LG_PR_TARGET=$target_branch" >> "$BASH_ENV"
+
   notify_slack_error:
     steps:
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: fail
-          channel: $SLACK_CHANNEL,$SLACK_CHANNEL2
+          channel: 
+            if: << pipeline.git.branch == "master" >>
+            then: "$SLACK_CHANNEL"
+            else: "$SLACK_CHANNEL2"
           custom: |
             {
               "blocks": [
@@ -92,7 +96,10 @@ commands:
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: pass
-          channel: $SLACK_CHANNEL,$SLACK_CHANNEL2
+          channel: 
+            if: << pipeline.git.branch == "master" >>
+            then: "$SLACK_CHANNEL"
+            else: "$SLACK_CHANNEL2"
           custom: |
             {
               "blocks": [
@@ -144,9 +151,7 @@ commands:
                   "elements": [
                     {
                       "type": "button",
-                      "action_id": "basic_success_view",
-                      "text": {
-                        "type": "plain_text",
+                      "action_id": "basic_success_view", "text": { "type": "plain_text",
                         "text": "View Job"
                       },
                       "url": "${CIRCLE_BUILD_URL}"
