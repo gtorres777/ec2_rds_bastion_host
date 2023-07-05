@@ -923,12 +923,10 @@ jobs:
             command: | 
               if [ ${CIRCLE_BRANCH} = "master" ]; then 
                 echo "BRANCH ${CIRCLE_BRANCH}"
-                echo "SLACK_CHANNEL_TARGET before ${SLACK_CHANNEL_TARGET}"
-                echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV 
+                echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV;
               elif [[ "${CIRCLE_BRANCH}" = "staging" || "${CIRCLE_BRANCH}" = "production" ]]; then 
                 echo "IS ${CIRCLE_BRANCH}"
-                echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV \
-                echo "export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL" >> $BASH_ENV;  
+                echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV 
               fi
 
         - run:
