@@ -5,7 +5,7 @@ description: |
 executors:
   ubuntu-executor:
     docker:
-      - image: cimg/base:current-20.04
+      - image: cimg/base:stable
 
 orbs:
   slack: circleci/slack@4.3.0
