@@ -919,6 +919,11 @@ jobs:
               echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
 
         - run:
+            name: PRINT Commit Message
+            command: |
+              echo $COMMIT_MESSAGE
+
+        - run:
             name: Set Slack target channel
             command: | 
               if [ ${CIRCLE_BRANCH} = "master" ]; then 
