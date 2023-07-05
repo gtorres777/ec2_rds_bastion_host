@@ -23,7 +23,7 @@ commands:
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: fail
-          channel: $SLACK_CHANNEL
+          channel: $SLACK_CHANNEL,$SLACK_CHANNEL2
           custom: |
             {
               "blocks": [
@@ -92,7 +92,7 @@ commands:
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: pass
-          channel: $SLACK_CHANNEL
+          channel: $SLACK_CHANNEL,$SLACK_CHANNEL2
           custom: |
             {
               "blocks": [
