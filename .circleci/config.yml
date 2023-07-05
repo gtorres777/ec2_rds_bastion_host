@@ -10,6 +10,31 @@ orbs:
   slack: circleci/slack@4.3.0
 
 commands:
+  set_commit_message:
+    steps:
+      - run:
+          name: Set Commit Message
+          command: |
+            echo 'export COMMIT_MESSAGE=$(git log --oneline --format=%s -n 1 $CIRCLE_SHA1 | tr -cd '[:print:]')' >> $BASH_ENV
+
+      - run:
+          name: PRINT Commit Message
+          command: |
+            echo $COMMIT_MESSAGE
+
+  set_slack_target_channel:
+    steps:
+      - run:
+          name: Set Slack target channel
+          command: | 
+            if [ ${CIRCLE_BRANCH} = "master" ]; then 
+              echo "BRANCH ${CIRCLE_BRANCH}"
+              echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV;
+            elif [[ "${CIRCLE_BRANCH}" = "staging" || "${CIRCLE_BRANCH}" = "production" ]]; then 
+              echo "BRANCH ${CIRCLE_BRANCH}"
+              echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV; 
+            fi
+
   set_pull_request_branch:
     steps:
       - run:
@@ -193,36 +218,15 @@ jobs:
       #       - tfstates
       - checkout
 
-      - run:
-          name: Set Commit Message
-          command: |
-            echo 'export COMMIT_MESSAGE=$(git log --oneline --format=%s -n 1 $CIRCLE_SHA1 | tr -cd '[:print:]')' >> $BASH_ENV
+      - set_commit_message
 
-      - run:
-          name: PRINT Commit Message
-          command: |
-            echo $COMMIT_MESSAGE
-
-      - run:
-          name: Set Slack target channel
-          command: | 
-            if [ ${CIRCLE_BRANCH} = "master" ]; then 
-              echo "BRANCH ${CIRCLE_BRANCH}"
-              echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV;
-            elif [[ "${CIRCLE_BRANCH}" = "staging" || "${CIRCLE_BRANCH}" = "production" ]]; then 
-              echo "IS ${CIRCLE_BRANCH}"
-              echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV 
-            fi
-
-      - run:
-          name: PRINT SLACK CHANNEL
-          command: | 
-            echo "SLACK_CHANNEL_TARGET after ${SLACK_CHANNEL_TARGET}"
+      - set_slack_target_channel
 
       - run:
           name: Install Terraform
           command: |
             ls
+
       - notify_slack_error
       - notify_slack_pass
 
