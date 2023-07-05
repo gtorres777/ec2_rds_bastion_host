@@ -214,6 +214,11 @@ jobs:
             fi
 
       - run:
+          name: PRINT SLACK CHANNEL
+          command: | 
+            echo "SLACK_CHANNEL_TARGET after ${SLACK_CHANNEL_TARGET}"
+
+      - run:
           name: Install Terraform
           command: |
             ls
