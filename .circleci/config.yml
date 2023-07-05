@@ -731,7 +731,6 @@ workflows:
     jobs:
       - on-hold:
           branch_pattern: "master|staging|production"
-          event: pass
           channel: $SLACK_CHANNEL_TARGET
           custom: |
             {
