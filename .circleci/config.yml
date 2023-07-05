@@ -156,8 +156,9 @@ commands:
             }
 
 jobs:
-
   validate:
+    environment:
+      CIRCLE_UNMASK_ENV_VARS: true
     executor: ubuntu-executor
     steps:
       # # Install Terraform
