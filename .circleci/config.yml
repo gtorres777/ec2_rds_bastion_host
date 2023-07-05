@@ -18,12 +18,12 @@ commands:
             # Default branch to avoid issues.
             target_branch="master"
             echo "export LG_PR_TARGET=$target_branch" >> "$BASH_ENV"
+
   notify_slack_error:
     steps:
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: fail
-          channel: $SLACK_CHANNEL,$SLACK_CHANNEL2
           custom: |
             {
               "blocks": [
@@ -92,7 +92,7 @@ commands:
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: pass
-          channel: $SLACK_CHANNEL,$SLACK_CHANNEL2
+          channel: $SLACK_CHANNEL_TARGET
           custom: |
             {
               "blocks": [
@@ -144,9 +144,7 @@ commands:
                   "elements": [
                     {
                       "type": "button",
-                      "action_id": "basic_success_view",
-                      "text": {
-                        "type": "plain_text",
+                      "action_id": "basic_success_view", "text": { "type": "plain_text",
                         "text": "View Job"
                       },
                       "url": "${CIRCLE_BUILD_URL}"
@@ -198,6 +196,16 @@ jobs:
           name: Set Commit Message
           command: |
             echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
+
+      - run:
+          name: Set Slack target channel
+          command: | 
+            if [ ${CIRCLE_BRANCH} = "master" ]; then
+              echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV
+            else
+              echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL,$SLACK_CHANNEL2' >> $BASH_ENV
+            fi
+
       - run:
           name: Install Terraform
           command: |
