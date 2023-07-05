@@ -200,7 +200,7 @@ jobs:
       - run:
           name: Set Slack target channel
           environment:
-            CHANNEL_TARGET: <<parameters.git.branch>>
+            CHANNEL_TARGET: << parameters.git.branch >>
           command: | 
             if [ $CHANNEL_TARGET = "master" ]; then
               echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV
