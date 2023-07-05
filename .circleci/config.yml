@@ -916,8 +916,7 @@ jobs:
         - run:
             name: Set Commit Message
             command: |
-              # echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1 | tr -cd '[:print:]')' >> $BASH_ENV
-              echo 'export COMMIT_MESSAGE=$(git show -s --format=%B "$CIRCLE_SHA1" | awk '{printf "%s\\n", $0}')' >> $BASH_ENV
+              echo 'export COMMIT_MESSAGE=$(git log --oneline --format=%B -n 1 $CIRCLE_SHA1 | tr -cd '[:print:]')' >> $BASH_ENV
 
         - run:
             name: PRINT Commit Message
