@@ -162,7 +162,11 @@ commands:
                             # shellcheck disable=SC2001
                             echo "AQUI EL QUE ENTRA"
                             echo "$SLACK_PARAM_CHANNEL"
-                            for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g") do echo "Sending to Slack Channel: $i" SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel') if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
+                            for i in $(eval echo \""$SLACK_PARAM_CHANNEL"\" | sed "s/,/ /g")
+                            do
+                                echo "Sending to Slack Channel: $i"
+                                SLACK_MSG_BODY=$(echo "$SLACK_MSG_BODY" | jq --arg channel "$i" '.channel = $channel')
+                                if [ "$SLACK_PARAM_DEBUG" -eq 1 ]; then
                                     printf "%s\n" "$SLACK_MSG_BODY" > "$SLACK_MSG_BODY_LOG"
                                     echo "The message body being sent to Slack can be found below. To view redacted values, rerun the job with SSH and access: ${SLACK_MSG_BODY_LOG}"
                                     echo "$SLACK_MSG_BODY"
@@ -695,16 +699,15 @@ jobs:
                 name: Set Commit Message
                 command: |
                   echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
-
             - run:
                 name: Set Slack target channel
                 command: | 
-                  if [ ${CIRCLE_BRANCH} != "master" ]; then \
+                  if [ ${CIRCLE_BRANCH} = "master" ]; then \
                     echo "BRANCH ${CIRCLE_BRANCH}"
                     echo "SLACK_CHANNEL_TARGET before ${SLACK_CHANNEL_TARGET}"
                     echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV \
                     echo "SLACK_CHANNEL_TARGET after ${SLACK_CHANNEL_TARGET}"
-                  elif [[ "${CIRCLE_BRANCH}" != "staging" || "${CIRCLE_BRANCH}" != "production" ]]; then \
+                  elif [[ "${CIRCLE_BRANCH}" = "staging" || "${CIRCLE_BRANCH}" = "production" ]]; then \
                     echo "IS ${CIRCLE_BRANCH}"
                     echo "SLACK_CHANNEL_TARGET ${SLACK_CHANNEL_TARGET}"
                     echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV \
