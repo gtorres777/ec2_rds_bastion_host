@@ -1,7 +1,147 @@
 version: 2.1
 description: |
     Implement event-based notifications across all of your CI/CD pipelines. Utilizing built-in message templates or Slack's visual Block-Kit builder, create and customize notifications specific to your organization's needs. Supports Linux x86_64, MacOS, Arm64 V8, and Windows.
+
+orbs:
+  slack: circleci/slack@4.3.0
+
 commands:
+  notify_slack_error:
+    steps:
+      - slack/notify:
+          branch_pattern: "master|staging|production"
+          event: fail
+          channel: $SLACK_CHANNEL_TARGET
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Job Failed. :red_circle:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Job*: ${CIRCLE_JOB}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project*: $CIRCLE_PROJECT_REPONAME"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch*: $CIRCLE_BRANCH"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Message*: $COMMIT_MESSAGE"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author*: $CIRCLE_USERNAME"
+                    }
+                  ],
+                  "accessory": {
+                    "type": "image",
+                    "image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+                    "alt_text": "CircleCI logo"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "action_id": "basic_fail_view",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Job"
+                      },
+                      "url": "${CIRCLE_BUILD_URL}"
+                    }
+                  ]
+                }
+              ]
+            }
+
+  notify_slack_pass:
+    steps:
+      - slack/notify:
+          branch_pattern: "master|staging|production"
+          event: pass
+          channel: $SLACK_CHANNEL_TARGET
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Job Succeeded. :white_check_mark:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Job*: ${CIRCLE_JOB}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project*: $CIRCLE_PROJECT_REPONAME"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch*: $CIRCLE_BRANCH"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Message*: $COMMIT_MESSAGE"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author*: $CIRCLE_USERNAME"
+                    }
+                  ],
+                  "accessory": {
+                    "type": "image",
+                    "image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+                    "alt_text": "CircleCI logo"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "action_id": "basic_success_view", "text": { "type": "plain_text",
+                        "text": "View Job"
+                      },
+                      "url": "${CIRCLE_BUILD_URL}"
+                    }
+                  ]
+                }
+              ]
+            }
+
     notify:
         parameters:
             branch_pattern:
@@ -730,6 +870,77 @@ jobs:
                 mentions: <<parameters.mentions>>
                 step_name: <<parameters.step_name>>
                 template: <<parameters.template>>
+
+    validate:
+      environment:
+        CIRCLE_UNMASK_ENV_VARS: true
+      executor: ubuntu-executor
+      steps:
+        # # Install Terraform
+        # - run:
+        #     name: Install Terraform
+        #     command: |
+        #       TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+        #       curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+        #       unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+        #       sudo mv terraform /usr/local/bin/
+        #       rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+
+        # # Configure AWS credentials
+        # - run:
+        #     name: Configure AWS credentials
+        #     command: |
+        #       echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+        #       echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+        #       source $BASH_ENV
+        # - checkout
+        # - set_pull_request_branch
+        # - run:
+        #     name: "Initialize resources"
+        #     command: ./scripts/terraform init
+        # - persist_to_workspace:
+        #     root: .
+        #     paths:
+        #       - .terraform
+        #       - .terraform.lock.hcl
+        #       - environments
+        #       - modules
+        #       - scripts
+        #       - shared
+        #       - tfstates
+        - checkout
+        - run:
+            name: Set Commit Message
+            command: |
+              echo 'export COMMIT_MESSAGE=$(git log --format=%B -n 1 $CIRCLE_SHA1)' >> $BASH_ENV
+
+        - run:
+            name: Set Slack target channel
+            command: | 
+              if [ ${CIRCLE_BRANCH} = "master" ]; then \
+                echo "BRANCH ${CIRCLE_BRANCH}"
+                echo "SLACK_CHANNEL_TARGET before ${SLACK_CHANNEL_TARGET}"
+                echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV \
+                echo "SLACK_CHANNEL_TARGET after ${SLACK_CHANNEL_TARGET}"
+              elif [[ "${CIRCLE_BRANCH}" = "staging" || "${CIRCLE_BRANCH}" = "production" ]]; then \
+                echo "IS ${CIRCLE_BRANCH}"
+                echo "SLACK_CHANNEL_TARGET ${SLACK_CHANNEL_TARGET}"
+                echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV \
+                echo "SLACK_CHANNEL_TARGET after ${SLACK_CHANNEL_TARGET}"
+              fi
+
+        - run:
+            name: PRINT SLACK CHANNEL
+            command: | 
+              echo "SLACK_CHANNEL_TARGET after ${SLACK_CHANNEL_TARGET}"
+
+        - run:
+            name: Install Terraform
+            command: |
+              ls
+        - notify_slack_error
+        - notify_slack_pass
+
 workflows:
   validate_and_plan:
     jobs:
@@ -796,6 +1007,8 @@ workflows:
                 }
               ]
             }
+
+      - validate
 
 # version: 2.1
 
