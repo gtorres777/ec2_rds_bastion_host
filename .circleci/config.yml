@@ -24,6 +24,7 @@ commands:
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: fail
+          channel: $SLACK_CHANNEL_TARGET
           custom: |
             {
               "blocks": [
@@ -203,7 +204,7 @@ jobs:
             if [ ${CIRCLE_BRANCH} = "master" ]; then
               printf 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV
             else
-              printf 'export SLACK_CHANNEL_TARGET=\$SLACK_CHANNEL,\$SLACK_CHANNEL2' >> $BASH_ENV
+              printf 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL,$SLACK_CHANNEL2' >> $BASH_ENV
             fi
 
       - run:
