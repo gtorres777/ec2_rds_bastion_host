@@ -201,12 +201,12 @@ jobs:
       - run:
           name: Set Slack target channel
           command: | 
-            if [ ${CIRCLE_BRANCH} = "master" ]; then
+            if [ ${CIRCLE_BRANCH} != "master" ]; then
               echo "BRANCH ${CIRCLE_BRANCH}"
               echo "SLACK_CHANNEL_TARGET before ${SLACK_CHANNEL_TARGET}"
               echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV
               echo "SLACK_CHANNEL_TARGET after ${SLACK_CHANNEL_TARGET}"
-            elif [[ "${CIRCLE_BRANCH}" = "staging" || "${CIRCLE_BRANCH}" = "production" ]]; then
+            elif [[ "${CIRCLE_BRANCH}" != "staging" || "${CIRCLE_BRANCH}" != "production" ]]; then
               echo "IS ${CIRCLE_BRANCH}"
               echo "SLACK_CHANNEL_TARGET ${SLACK_CHANNEL_TARGET}"
               echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV
