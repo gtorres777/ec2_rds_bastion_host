@@ -2,6 +2,11 @@ version: 2.1
 description: |
     Implement event-based notifications across all of your CI/CD pipelines. Utilizing built-in message templates or Slack's visual Block-Kit builder, create and customize notifications specific to your organization's needs. Supports Linux x86_64, MacOS, Arm64 V8, and Windows.
 
+executors:
+  ubuntu-executor:
+    docker:
+      - image: cimg/base:current-20.04
+
 orbs:
   slack: circleci/slack@4.3.0
 
@@ -872,8 +877,6 @@ jobs:
                 template: <<parameters.template>>
 
     validate:
-      environment:
-        CIRCLE_UNMASK_ENV_VARS: true
       executor: ubuntu-executor
       steps:
         # # Install Terraform
