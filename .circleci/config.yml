@@ -24,10 +24,6 @@ commands:
       - slack/notify:
           branch_pattern: "master|staging|production"
           event: fail
-          channel: 
-            if: << pipeline.git.branch == "master" >>
-            then: "$SLACK_CHANNEL"
-            else: "$SLACK_CHANNEL2"
           custom: |
             {
               "blocks": [
@@ -97,7 +93,7 @@ commands:
           branch_pattern: "master|staging|production"
           event: pass
           channel: 
-            if: << pipeline.git.branch == "master" >>
+            if: \<\< pipeline.git.branch == "master" \>\>
             then: "$SLACK_CHANNEL"
             else: "$SLACK_CHANNEL2"
           custom: |
