@@ -35,6 +35,11 @@ commands:
               echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV; 
             fi
 
+      - run:
+          name: Print Slack target channel
+          command: | 
+            echo "Target channel ${SLACK_CHANNEL_TARGET}"
+
   set_pull_request_branch:
     steps:
       - run:
