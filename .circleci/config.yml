@@ -182,7 +182,9 @@ commands:
 
 jobs:
   validate:
-    executor: ubuntu-executor
+    # executor: ubuntu-executor
+    docker:
+      - image: cimg/node:16.14-browsers
     steps:
       # # Install Terraform
       # - run:
@@ -329,7 +331,9 @@ jobs:
 workflows:
   validate_and_plan:
     jobs:
-      - validate
+      - validate:
+          context:
+            -org-global
       # - plan:
       #     requires:
       #       - validate
