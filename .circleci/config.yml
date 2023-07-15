@@ -340,7 +340,7 @@ jobs:
           name: Install Terraform
           command: |
             if [ << pipeline.parameters.ENABLE_TESTS >> = true ]; then
-              /.tests.sh
+              ./tests.sh
             else
               exit 0
 
