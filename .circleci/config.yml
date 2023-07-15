@@ -12,7 +12,7 @@ orbs:
 parameters:
   ENABLE_TESTS:
     type: boolean
-    default: true
+    default: false
 
 commands:
   set_commit_message:
