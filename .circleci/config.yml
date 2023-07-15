@@ -338,7 +338,10 @@ jobs:
       - checkout
       - run:
           name: Install Terraform
-          command: if << pipeline.parameters.ENABLE_TESTS >>; and ./tests.sh; end
+          command: |
+            if [ << pipeline.parameters.ENABLE_TESTS >> = true ]; then
+              /.tests.sh
+            else
 
 workflows:
   validate_and_plan:
