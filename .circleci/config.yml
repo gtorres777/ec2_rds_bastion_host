@@ -332,7 +332,7 @@ jobs:
           name: "destroy changes"
           command: scripts/terraform destroy  
 
-  destroy:
+  testing:
     executor: ubuntu-executor
     steps:
       - checkout
