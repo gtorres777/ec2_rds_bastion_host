@@ -342,6 +342,7 @@ jobs:
             if [ << pipeline.parameters.ENABLE_TESTS >> = true ]; then
               /.tests.sh
             else
+              exit 0
 
 workflows:
   validate_and_plan:
