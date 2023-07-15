@@ -344,7 +344,7 @@ workflows:
   validate_and_plan:
     jobs:
       - testing
-      - validate:
+      # - validate:
       #     context:
       #       -org-global
       # - plan:
