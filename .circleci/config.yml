@@ -9,6 +9,11 @@ orbs:
   terraform: circleci/terraform@3.0.0
   slack: circleci/slack@4.3.0
 
+parameters:
+  ENABLE_TESTS:
+    type: boolean
+    default: true
+
 commands:
   set_commit_message:
     steps:
@@ -327,19 +332,27 @@ jobs:
           name: "destroy changes"
           command: scripts/terraform destroy  
 
+  destroy:
+    executor: ubuntu-executor
+    steps:
+      - checkout
+      - run:
+          name: Install Terraform
+          command: if << pipeline.parameters.ENABLE_TESTS >>; and ./tests.sh; end
 
 workflows:
   validate_and_plan:
     jobs:
+      - testing
       - validate:
-          context:
-            -org-global
-      - plan:
-          requires:
-            - validate
-      - apply:
-          requires:
-            - plan
-      - destroy:
-          requires:
-            - apply
+      #     context:
+      #       -org-global
+      # - plan:
+      #     requires:
+      #       - validate
+      # - apply:
+      #     requires:
+      #       - plan
+      # - destroy:
+      #     requires:
+      #       - apply

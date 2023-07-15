@@ -8,7 +8,11 @@ resource "aws_cloudwatch_metric_alarm" "foobar" {
   statistic                 = var.statistic
   threshold                 = var.threshold
 
+  # dimensions = {
+  #   DBInstanceIdentifier = "rds-prod"
+  # }
+
   dimensions = {
-    DBInstanceIdentifier = "rds-prod"
+    "${var.dimensions_name}" = "${var.dimensions_value}"
   }
 }

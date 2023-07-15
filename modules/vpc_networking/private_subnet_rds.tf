@@ -21,9 +21,15 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
 
 }
 
+
 resource "aws_route_table" "private_rds_rt" {
   vpc_id = aws_vpc.main_vpc.id
+  count  = 1
 
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gws.*.id[count.index]
+  }
   tags = {
     Name = "private_rds_rt"
   }
@@ -33,5 +39,5 @@ resource "aws_route_table" "private_rds_rt" {
 resource "aws_route_table_association" "private_rds_rta" {
   count          = length(var.private_subnets_rds_cidr)
   subnet_id      = aws_subnet.private_subnets_rds.*.id[count.index]
-  route_table_id = aws_route_table.private_rds_rt.id
+  route_table_id = aws_route_table.private_rds_rt.*.id[0]
 }

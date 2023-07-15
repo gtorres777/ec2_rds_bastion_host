@@ -31,3 +31,10 @@ variable "threshold" {
 }
 
 
+variable "dimension_name" {
+  type        = string
+}
+
+variable "dimension_value" {
+  type        = string
+}

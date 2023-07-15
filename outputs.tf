@@ -6,3 +6,7 @@
 #   value = module.rds-prod.rds_endpoint
 # }
 
+
+output "source_code_hash" {
+  value = module.canary.source_code_hash
+}
