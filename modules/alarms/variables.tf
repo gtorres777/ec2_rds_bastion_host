@@ -31,10 +31,10 @@ variable "threshold" {
 }
 
 
-variable "dimension_name" {
+variable "dimensions_name" {
   type        = string
 }
 
-variable "dimension_value" {
+variable "dimensions_value" {
   type        = string
 }

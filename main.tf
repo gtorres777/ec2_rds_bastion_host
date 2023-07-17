@@ -15,16 +15,16 @@ module "vpc_networking" {
 
 }
 
-# module "ec2_ubuntu" {
-#   source = "./modules/ec2_ubuntu"
+module "ec2_ubuntu" {
+  source = "./modules/ec2_ubuntu"
 
-#   vpc_id        = module.vpc_networking.vpc_id
-#   path_to_key   = "keys/mykey.pub"
-#   ec2_name      = "ec2 bastion host"
-#   instance_type = "t3.micro"
-#   subnet_id     = module.vpc_networking.public_subnets_ids[1]
+  vpc_id        = module.vpc_networking.vpc_id
+  path_to_key   = "keys/mykey.pub"
+  ec2_name      = "ec2 bastion host"
+  instance_type = "t3.micro"
+  subnet_id     = module.vpc_networking.public_subnets_ids[1]
 
-# }
+}
 
 # module "rds-prod" {
 #   source = "./modules/rds"
@@ -230,8 +230,8 @@ module "alarm" {
   period                    = 900
   statistic                 = "Sum"
   threshold                 = 2.0
-  dimension_name            = "CanaryName"
-  dimension_value           = module.canary.cloudwatch_canary.name
+  dimensions_name            = "CanaryName"
+  dimensions_value           = module.canary.cloudwatch_canary.name
 
   depends_on = [
     module.canary
