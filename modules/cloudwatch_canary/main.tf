@@ -30,6 +30,33 @@ data "archive_file" "canary_code" {
   output_path = "${var.relative_path}/${var.output_path}/${local.source_code_hash}.zip"
 }
 
+resource "aws_security_group" "canary_sg" {
+  name   = "canary_sg"
+  vpc_id = var.vpc_id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.private_subnet_cidr}"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    security_groups = ["${var.alb_security_group_id}"]
+  }
+
+  # Allow all outbound traffic.
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_synthetics_canary" "canary" {
   name                 = "nextcloud"
   artifact_s3_location = "s3://cwt-syn-results-881422822893-us-east-1/canary/us-east-1/nextcloud"
@@ -42,6 +69,11 @@ resource "aws_synthetics_canary" "canary" {
   start_canary = true
   schedule {
     expression = "rate(5 minutes)"
+  }
+
+  vpc_config {
+    subnet_ids         = var.private_subnets_ids
+    security_group_ids = [aws_security_group.canary_sg.id]
   }
 
 }

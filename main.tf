@@ -212,6 +212,8 @@ module "canary" {
   source_dir = "canaries_code/nextcloud"
   output_path = "canaries_code/nextcloud"
   canaries_code_directory = "canaries_code/nextcloud"
+  vpc_id = module.vpc_networking.vpc_id 
+  private_subnets_ids  = module.vpc_networking.private_subnets_ids
 
   depends_on = [
     module.alb,

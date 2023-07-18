@@ -84,7 +84,7 @@ resource "aws_lb_target_group" "nextcloud" {
 
 ## Default Security Group
 resource "aws_security_group" "default" {
-  name        = "alb--sg"
+  name        = "alb-sg"
   description = "Application Load Balancer SG" 
   vpc_id      = var.vpc_id
 
