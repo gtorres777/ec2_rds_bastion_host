@@ -18,7 +18,7 @@ resource "aws_ecs_service" "project" {
   enable_execute_command = true
 
   network_configuration {
-    security_groups = [module.ecs_security_group.security_group_id]
+    security_groups = [aws_security_group.allow-custom-alb.id]
     subnets         = var.private_subnets
   }
 
@@ -39,33 +39,38 @@ resource "aws_ecs_service" "project" {
 
 }
 
-module "ecs_security_group" {
-  create      = var.create ? true : false
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "4.17.1"
-  name        = "ecs-sg"
-  vpc_id      = var.vpc_id
+resource "aws_security_group" "allow-custom-alb" {
+  vpc_id = var.vpc_id
+  name = "ecs-sg"
+  description = "security group that allows custom protocols and all egress traffic to ALB"
 
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = var.task_web_port
-      to_port     = var.task_web_port
-      protocol    = "tcp"
-      description = "Custom TCP service port"
-      cidr_blocks = "0.0.0.0/0"
-    },
-    {
-      from_port   = 8888
-      to_port     = 8888
-      protocol    = "tcp"
-      description = "Shell Port"
-      cidr_blocks = "0.0.0.0/0"
-    }
-  ]
-  egress_cidr_blocks  = ["0.0.0.0/0"]
-  egress_rules        = ["all-all"]
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    description = "VPC"
+    cidr_blocks = ["11.0.0.0/16"]
+  }
+
+  ingress {
+    from_port   = var.task_web_port
+    to_port     = var.task_web_port
+    protocol    = "tcp"
+    description = "Custom TCP service port"
+    security_groups = [var.alb_sg_id]
+  }
+
+  tags = {
+    Name = "allow-custom-alb"
+  }
 }
-
 
 ### ECS Tasks Execution Role
 data "aws_iam_policy_document" "ecs_tasks_execution_role" {

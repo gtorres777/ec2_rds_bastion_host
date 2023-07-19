@@ -1,17 +1,20 @@
-module "service_nextcloud" {
+module "nextcloud-ecs" {
     source = "../../modules/ecs"
     create = true
 
     # Network/Account Settings
-    vpc_id = module.vpc.vpc_id
-    private_subnets = module.vpc.private_subnets # Where be located the tasks.
+    vpc_id = module.vpc_networking.vpc_id
+    private_subnets = module.vpc_networking.private_subnets_ids # Where be located the tasks.
     alb = module.alb # LoadBalancer
-    target_group_arn = module.alb.webflow_tg.arn
+
+    target_group_arn = module.alb.nextcloud-tg-arn
 
     # Task Degfinition (Per Componente)
-    task_web_port = 8101 ## This must match with the por specified in 0.0.0.0:8000
-    desired_tasks = 0
-
-    # Don't forget to match task_web_port with the 0.0.0.0:8000 (Per Component)
-    entry_point = []
+    task_web_port = 80 ## This must match with the por specified in 0.0.0.0:8000
+    desired_tasks = 1
+    alb_sg_id = module.alb.alb-sg.id
+   
+    depends_on = [
+      module.alb
+    ]
 }

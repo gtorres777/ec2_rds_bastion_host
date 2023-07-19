@@ -30,3 +30,6 @@ variable "is_a_worker" {
     type = bool
     default = false
 }
+
+variable "alb_sg_id" {
+}

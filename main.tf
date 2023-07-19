@@ -15,16 +15,16 @@ module "vpc_networking" {
 
 }
 
-module "ec2_ubuntu" {
-  source = "./modules/ec2_ubuntu"
+# module "ec2_ubuntu" {
+#   source = "./modules/ec2_ubuntu"
 
-  vpc_id        = module.vpc_networking.vpc_id
-  path_to_key   = "keys/mykey.pub"
-  ec2_name      = "ec2 bastion host"
-  instance_type = "t3.micro"
-  subnet_id     = module.vpc_networking.public_subnets_ids[1]
+#   vpc_id        = module.vpc_networking.vpc_id
+#   path_to_key   = "keys/mykey.pub"
+#   ec2_name      = "ec2 bastion host"
+#   instance_type = "t3.micro"
+#   subnet_id     = module.vpc_networking.public_subnets_ids[1]
 
-}
+# }
 
 # module "rds-prod" {
 #   source = "./modules/rds"
@@ -195,6 +195,7 @@ module "nextcloud-ecs" {
     # Task Degfinition (Per Componente)
     task_web_port = 80 ## This must match with the por specified in 0.0.0.0:8000
     desired_tasks = 1
+    alb_sg_id = module.alb.alb-sg.id
    
   depends_on = [
     module.alb
@@ -206,14 +207,20 @@ module "snstux" {
 }
 
 module "canary" {
-  source = "./modules/cloudwatch_canary"
+  source = "./modules/synthethics_canaries"
 
   relative_path = "/home/tux/Projects/AWS/practice/ec2_rds_bastion_host"
   source_dir = "canaries_code/nextcloud"
-  output_path = "canaries_code/nextcloud"
-  canaries_code_directory = "canaries_code/nextcloud"
+  canary_name = "nextcloud"
   vpc_id = module.vpc_networking.vpc_id 
   private_subnets_ids  = module.vpc_networking.private_subnets_ids
+  private_subnet_cidr = module.vpc_networking.private_subnets_cidr
+  alb_security_group_id = module.alb.alb-sg.id
+  artifact_s3_location = "s3://cwt-syn-results-881422822893-us-east-1/canary/us-east-1/nextcloud"
+  handler              = "main.handler"
+  runtime_version      = "syn-python-selenium-1.3"
+  start_canary = true
+  expression = "rate(5 minutes)"
 
   depends_on = [
     module.alb,
@@ -234,6 +241,7 @@ module "alarm" {
   threshold                 = 2.0
   dimensions_name            = "CanaryName"
   dimensions_value           = module.canary.cloudwatch_canary.name
+  alarm_actions = [module.snstux.aws_sns_topic_arn]
 
   depends_on = [
     module.canary

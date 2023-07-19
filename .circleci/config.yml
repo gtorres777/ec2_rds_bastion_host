@@ -348,10 +348,10 @@ jobs:
 workflows:
   validate_and_plan:
     jobs:
-      - testing
-      # - validate:
-      #     context:
-      #       -org-global
+      # - testing
+      - validate:
+          context:
+            -org-global
       # - plan:
       #     requires:
       #       - validate

@@ -20,8 +20,8 @@ data "aws_iam_policy_document" "sns_policy" {
     resources = [aws_sns_topic.sns_topic.arn]
 
     principals {
-      type        = "Service"
-      identifiers = ["chatbot.amazonaws.com"]
+      type        = "AWS"
+      identifiers = ["*"]
     }
   }
 }
