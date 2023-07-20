@@ -368,6 +368,6 @@ workflows:
       - apply:
           requires:
             - plan
-      - destroy:
-          requires:
-            - apply
+      # - destroy:
+      #     requires:
+      #       - apply
