@@ -273,6 +273,8 @@ jobs:
             - environments/*/tfplan
             - environments/*/lambdas_code/*
             - environments/*/lambdas_test/*
+            - environments/*/canaries_code/*
+            - environments/*/lambdas_test/*
 
   apply:
     executor: ubuntu-executor
