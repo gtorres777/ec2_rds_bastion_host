@@ -6,6 +6,7 @@ def main():
 
     url = "http://11.0.3.164"
 
+
     # Set screenshot option
     takeScreenshot = True
 
