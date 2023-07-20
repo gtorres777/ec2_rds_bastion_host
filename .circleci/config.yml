@@ -352,9 +352,9 @@ workflows:
       - validate:
           context:
             -org-global
-      # - plan:
-      #     requires:
-      #       - validate
+      - plan:
+          requires:
+            - validate
       # - apply:
       #     requires:
       #       - plan
