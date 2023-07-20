@@ -4,7 +4,7 @@ import boto3
 
 def main():
 
-    url = "http://11.0.3.151"
+    url = "http://11.0.3.164"
 
     # Set screenshot option
     takeScreenshot = True
