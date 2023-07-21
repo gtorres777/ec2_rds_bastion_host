@@ -18,7 +18,7 @@ def nextcloud_health_check(url):
         browser.get(url)
 
         # Wait for the page to load completely before extracting the page source
-        WebDriverWait(browser, 15)
+        WebDriverWait(browser, timeout=15)
 
         logger.info("RECIEN PAGE")
 
