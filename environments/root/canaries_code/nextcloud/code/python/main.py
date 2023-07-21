@@ -1,6 +1,6 @@
 from aws_synthetics.selenium import synthetics_webdriver as syn_webdriver
 from aws_synthetics.common import synthetics_logger as logger
-import json
+import json,time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -18,7 +18,8 @@ def nextcloud_health_check(url):
         browser.get(url)
 
         # Wait for the page to load completely before extracting the page source
-        WebDriverWait(browser, timeout=15).until(browser.execute_script("return window.performance.getEntries()[0]?.responseStatus;") is not None)
+        # WebDriverWait(browser, timeout=15).until(browser.execute_script("return window.performance.getEntries()[0]?.responseStatus;") is not None)
+        time.sleep(10)
 
         logger.info("RECIEN PAGE")
 
