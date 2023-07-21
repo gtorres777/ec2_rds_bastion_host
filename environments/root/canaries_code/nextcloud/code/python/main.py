@@ -44,7 +44,7 @@ def nextcloud_health_check(url):
 
         # Extract and validate the installed and maintenance fields from the JSON response
         installed = parsed_json.get("installed", False)
-        maintenance = parsed_json.get("maintenance", False)
+        maintenance = parsed_json.get("maintenance", True)
         if not installed:
             logger.info("Nextcloud is installed and healthy.")
         else:
