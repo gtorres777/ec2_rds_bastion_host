@@ -273,9 +273,7 @@ jobs:
             - environments/*/tfplan
             - environments/*/lambdas_code/*
             - environments/*/lambdas_test/*
-            - environments/*/canaries_code/*
-            - environments/*/lambdas_test/*
-
+            - environments/*/canaries_code/* - environments/*/lambdas_test/*
   apply:
     executor: ubuntu-executor
     steps:
@@ -368,6 +366,6 @@ workflows:
       - apply:
           requires:
             - plan
-      - destroy:
-          requires:
-            - apply
+      # - destroy:
+      #     requires:
+      #       - apply

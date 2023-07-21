@@ -4,8 +4,7 @@ import boto3
 
 def main():
 
-    url = "http://11.0.3.164"
-
+    url = "https://cloud.gustavo-td.com"
 
     # Set screenshot option
     takeScreenshot = True
