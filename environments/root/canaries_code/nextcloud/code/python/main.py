@@ -3,7 +3,13 @@ from aws_synthetics.common import synthetics_logger as logger
 import json
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+import requests
 
+def extract_json_from_page_source(page_source):
+    start_index = page_source.find("{")
+    end_index = page_source.rfind("}") + 1
+    json_data = page_source[start_index:end_index]
+    return json_data
 
 def nextcloud_health_check(url):
     browser = syn_webdriver.Chrome()
@@ -20,13 +26,15 @@ def nextcloud_health_check(url):
         # Get the page source JSON response
         page_source = browser.page_source
 
-        logger.info("PAGE SOURCE")
-        logger.info(page_source)
-
-        # Parse the JSON response
-        json_data = json.loads(page_source)
+        # Extract JSON content from the page source
+        json_data = extract_json_from_page_source(page_source)
         logger.info("JSON DATA")
         logger.info(json_data)
+
+        # Parse the JSON response
+        parsed_json = json.loads(json_data)
+        logger.info("PARSED JSON")
+        logger.info(parsed_json)
 
 
         # Extract and validate the HTTP status code
@@ -37,8 +45,8 @@ def nextcloud_health_check(url):
             raise Exception(f"HTTP status code is not 200 OK. Status: {status_code}")
 
         # Extract and validate the installed and maintenance fields in the JSON response
-        installed = json_data.get("installed", False)
-        maintenance = json_data.get("maintenance", False)
+        installed = parsed_json.get("installed", False)
+        maintenance = parsed_json.get("maintenance", False)
         if installed:
             logger.info("Nextcloud is installed and healthy.")
         else:
