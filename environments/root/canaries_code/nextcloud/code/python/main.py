@@ -3,7 +3,6 @@ from aws_synthetics.common import synthetics_logger as logger
 import json
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 def nextcloud_health_check(url):
@@ -14,7 +13,7 @@ def nextcloud_health_check(url):
         browser.get(url)
 
         # Wait for the page to load completely before extracting the page source
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "app-status")))
+        WebDriverWait(browser, 10)
 
         # Get the page source JSON response
         page_source = browser.page_source
