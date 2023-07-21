@@ -42,18 +42,18 @@ def nextcloud_health_check(url):
         else:
             raise Exception(f"HTTP status code is not 200 OK. Status: {status_code}")
 
-        # Extract and validate the installed and maintenance fields in the JSON response
+        # Extract and validate the installed and maintenance fields from the JSON response
         installed = parsed_json.get("installed", False)
         maintenance = parsed_json.get("maintenance", False)
-        if installed:
+        if not installed:
             logger.info("Nextcloud is installed and healthy.")
         else:
             raise Exception("Nextcloud is not installed or not healthy.")
 
-        if maintenance:
-            logger.info("Nextcloud is in maintenance mode.")
+        if not maintenance:
+            logger.info("Nextcloud is not in maintenance mode.")
         else:
-            raise Exception("Nextcloud is not in maintenance mode.")
+            raise Exception("Nextcloud is in maintenance mode.")
 
         logger.info("Canary successfully executed.")
 
