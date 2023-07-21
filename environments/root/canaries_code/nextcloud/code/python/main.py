@@ -15,14 +15,19 @@ def nextcloud_health_check(url):
         # Wait for the page to load completely before extracting the page source
         WebDriverWait(browser, 10)
 
+        logger.info("RECIEN PAGE")
+
         # Get the page source JSON response
         page_source = browser.page_source
 
+        logger.info("PAGE SOURCE")
+        logger.info(page_source)
+
         # Parse the JSON response
         json_data = json.loads(page_source)
-
         logger.info("JSON DATA")
         logger.info(json_data)
+
 
         # Extract and validate the HTTP status code
         status_code = browser.execute_script("return window.performance.getEntries()[0].response.status")
