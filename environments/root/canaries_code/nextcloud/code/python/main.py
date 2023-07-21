@@ -3,7 +3,6 @@ from aws_synthetics.common import synthetics_logger as logger
 import json
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-import requests
 
 def extract_json_from_page_source(page_source):
     start_index = page_source.find("{")
