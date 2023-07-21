@@ -21,6 +21,9 @@ def nextcloud_health_check(url):
         # Parse the JSON response
         json_data = json.loads(page_source)
 
+        logger.info("JSON DATA")
+        logger.info(json_data)
+
         # Extract and validate the HTTP status code
         status_code = browser.execute_script("return window.performance.getEntries()[0].response.status")
         if status_code == 200:
