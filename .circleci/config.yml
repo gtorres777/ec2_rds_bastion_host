@@ -267,13 +267,21 @@ jobs:
           name: verifying2
           command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
+      - run:
+          name: verifying canarie1
+          command: ls /home/circleci/project/environments/root/canaries_code/nextcloud
+
+      - run:
+          name: verifying canarie2
+          command: ls /home/circleci/project/environments/root/canaries_code/nextcloud/code
+
       - persist_to_workspace:
           root: .
           paths:
             - environments/*/tfplan
             - environments/*/lambdas_code/*
             - environments/*/lambdas_test/*
-            - environments/*/canaries_code/* - environments/*/lambdas_test/*
+            - environments/*/canaries_code/* 
   apply:
     executor: ubuntu-executor
     steps:
