@@ -1,6 +1,6 @@
 from aws_synthetics.selenium import synthetics_webdriver as syn_webdriver
 from aws_synthetics.common import synthetics_logger as logger
-import json,time
+import json
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -18,10 +18,8 @@ def nextcloud_health_check(url):
         browser.get(url)
 
         # Wait for the page to load completely before extracting the page source
-        # WebDriverWait(browser, timeout=15).until(browser.execute_script("return window.performance.getEntries()[0]?.responseStatus;") is not None)
-        time.sleep(10)
+        WebDriverWait(browser, 15)
 
-        logger.info("RECIEN PAGE")
 
         # Get the page source JSON response
         page_source = browser.page_source
@@ -36,19 +34,8 @@ def nextcloud_health_check(url):
         logger.info("PARSED JSON")
         logger.info(parsed_json)
 
-        status_code1 = browser.execute_script("return window.performance.getEntries()")
-        logger.info("RESPONSE STATUS1")
-        logger.info(status_code1)
-
         # Extract and validate the HTTP status code
-        status_code = browser.execute_script("return window.performance.getEntries()[0]?.responseStatus")
-        logger.info("RESPONSE STATUS")
-        logger.info(status_code)
-
-
-        status_code2 = browser.execute_script("return window.performance.getEntries()[0]")
-        logger.info("RESPONSE STATUS2")
-        logger.info(status_code2)
+        status_code = browser.get_http_response(url)
 
         if status_code == 200:
             logger.info("HTTP status code is 200 OK.")
