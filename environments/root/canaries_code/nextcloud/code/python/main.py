@@ -37,7 +37,7 @@ def nextcloud_health_check(url):
 
 
         # Extract and validate the HTTP status code
-        status_code = browser.execute_script("return window.performance.getEntries()[0].response.status")
+        status_code = browser.execute_script("return window.performance.getEntries()[0].responseStatus")
         if status_code == 200:
             logger.info("HTTP status code is 200 OK.")
         else:
