@@ -362,7 +362,6 @@ jobs:
             fi
 
   deploy:
-    resource_class: xlarge
     docker:
         - image: cimg/node:10.24.1-browsers
 
