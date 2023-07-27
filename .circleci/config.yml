@@ -369,6 +369,11 @@ jobs:
         - checkout
 
         - run:
+              name: Install Node.js libraries
+              command: |
+                  npm set progress=false
+                  sudo npm install -g firebase-tools@8.6.0
+        - run:
               name: Install AWS cli
               command: |
                   apt-get update
