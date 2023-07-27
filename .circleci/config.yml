@@ -8,6 +8,7 @@ executors:
 orbs:
   terraform: circleci/terraform@3.0.0
   slack: circleci/slack@4.3.0
+  jira: circleci/jira@1.0.5
 
 parameters:
   ENABLE_TESTS:
@@ -368,12 +369,29 @@ workflows:
       - validate:
           context:
             -org-global
-      - plan:
-          requires:
-            - validate
-      - apply:
-          requires:
-            - plan
-      - destroy:
-          requires:
-            - apply
+          post-steps:
+            - when:
+                condition:
+                  equal: [master, << pipeline.git.branch >>]
+                steps:
+                  - jira/notify:
+                      job_type: deployment
+                      environment: Testing
+                      environment_type: testing
+            - when:
+                condition:
+                  equal: [staging, << pipeline.git.branch >>]
+                steps:
+                  - jira/notify:
+                      job_type: deployment
+                      environment: Staging
+                      environment_type: staging
+      # - plan:
+      #     requires:
+      #       - validate
+      # - apply:
+      #     requires:
+      #       - plan
+      # - destroy:
+      #     requires:
+      #       - apply

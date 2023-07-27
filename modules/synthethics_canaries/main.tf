@@ -1,15 +1,15 @@
 locals {
-  # source_code = "${var.relative_path}/${var.source_dir}/code/python/main.py"
-  source_code = "/home/circleci/project/${var.relative_path}/${var.source_dir}/code/python/main.py"
+  source_code = "${var.relative_path}/${var.source_dir}/code/python/main.py"
+  # source_code = "/home/circleci/project/${var.relative_path}/${var.source_dir}/code/python/main.py"
   source_code_hash = filebase64sha256(local.source_code)
 }
 
 data "archive_file" "canary_code" {
   type        = "zip"
-  # source_dir = "${var.relative_path}/${var.source_dir}/code"
-  # output_path = "${var.relative_path}/${var.source_dir}/${local.source_code_hash}.zip"
-  source_dir = "/home/circleci/project/${var.relative_path}/${var.source_dir}/code"
-  output_path = "/home/circleci/project/${var.relative_path}/${var.source_dir}/${local.source_code_hash}.zip"
+  source_dir = "${var.relative_path}/${var.source_dir}/code"
+  output_path = "${var.relative_path}/${var.source_dir}/${local.source_code_hash}.zip"
+  # source_dir = "/home/circleci/project/${var.relative_path}/${var.source_dir}/code"
+  # output_path = "/home/circleci/project/${var.relative_path}/${var.source_dir}/${local.source_code_hash}.zip"
 }
 
 resource "aws_security_group" "canary_sg" {
