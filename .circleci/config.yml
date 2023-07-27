@@ -1,9 +1,9 @@
 version: 2.1
 
-executors:
-  ubuntu-executor:
-    docker:
-      - image: cimg/base:current-20.04
+# executors:
+#   ubuntu-executor:
+#     docker:
+#       - image: cimg/base:current-20.04
 
 orbs:
   terraform: circleci/terraform@3.0.0
@@ -109,8 +109,7 @@ commands:
                 },
                 {
                   "type": "actions",
-                  "elements": [
-                    {
+                  "elements": [ {
                       "type": "button",
                       "action_id": "basic_fail_view",
                       "text": {
@@ -362,11 +361,28 @@ jobs:
               exit 0
             fi
 
+  deploy:
+    resource_class: xlarge
+    docker:
+        - image: cimg/node:10.24.1-browsers
+
+    steps:
+        - checkout
+
+        - run:
+              name: Install AWS cli
+              command: |
+                  sudo apt-get update
+                  sudo apt-get install -y python-setuptools python3-pip
+                  sudo pip install awscli
+                  aws configure set preview.cloudfront true
+
 workflows:
   validate_and_plan:
     jobs:
       # - testing
-      - validate:
+      # - validate:
+      - deploy:
           context:
             -org-global
           post-steps:
