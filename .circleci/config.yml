@@ -363,7 +363,7 @@ jobs:
 
   deploy:
     docker:
-        - image: cimg/node:10.24.1-browsers
+        - image: google/cloud-sdk:352.0.0
 
     steps:
         - checkout
