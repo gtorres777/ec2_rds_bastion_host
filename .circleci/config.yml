@@ -369,17 +369,17 @@ jobs:
         - checkout
 
         - run:
+              name: Install AWS cli
+              command: |
+                  apt-get update
+                  apt-get install -y python-setuptools python3-pip
+                  pip install awscli
+                  aws configure set preview.cloudfront true
+        - run:
               name: Install Node.js libraries
               command: |
                   npm set progress=false
                   sudo npm install -g firebase-tools@8.6.0
-        - run:
-              name: Install AWS cli
-              command: |
-                  sudo apt-get update
-                  sudo apt-get install -y python-setuptools python3-pip
-                  sudo pip install awscli
-                  aws configure set preview.cloudfront true
 
 workflows:
   validate_and_plan:
