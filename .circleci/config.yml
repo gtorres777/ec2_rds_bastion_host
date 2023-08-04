@@ -6,9 +6,9 @@ version: 2.1
 #       - image: cimg/base:current-20.04
 
 orbs:
-  terraform: circleci/terraform@3.0.0
-  slack: circleci/slack@4.3.0
-  jira: circleci/jira@1.0.5
+    terraform: circleci/terraform@3.0.0
+    slack: circleci/slack@4.3.0
+    jira: circleci/jira@1.0.5
 
 parameters:
   ENABLE_TESTS:
@@ -16,402 +16,409 @@ parameters:
     default: false
 
 commands:
-  set_commit_message:
-    steps:
-      - run:
-          name: Set Commit Message
-          command: |
-            echo 'export COMMIT_MESSAGE=$(git log --oneline --format=%s -n 1 $CIRCLE_SHA1 | tr -cd '[:print:]')' >> $BASH_ENV
+    set_commit_message:
+      steps:
+        - run:
+            name: Set Commit Message
+            command: |
+              echo 'export COMMIT_MESSAGE=$(git log --oneline --format=%s -n 1 $CIRCLE_SHA1 | tr -cd '[:print:]')' >> $BASH_ENV
 
-      - run:
-          name: PRINT Commit Message
-          command: |
-            echo $COMMIT_MESSAGE
+        - run:
+            name: PRINT Commit Message
+            command: |
+              echo $COMMIT_MESSAGE
 
-  set_slack_target_channel:
-    steps:
-      - run:
-          name: Set Slack target channel
-          command: | 
-            if [ ${CIRCLE_BRANCH} = "master" ]; then 
-              echo "BRANCH ${CIRCLE_BRANCH}"
-              echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV;
-            elif [[ "${CIRCLE_BRANCH}" = "staging" || "${CIRCLE_BRANCH}" = "production" ]]; then 
-              echo "BRANCH ${CIRCLE_BRANCH}"
-              echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV; 
-            fi
+    set_slack_target_channel:
+      steps:
+        - run:
+            name: Set Slack target channel
+            command: | 
+              if [ ${CIRCLE_BRANCH} = "master" ]; then 
+                echo "BRANCH ${CIRCLE_BRANCH}"
+                echo 'export SLACK_CHANNEL_TARGET=$SLACK_CHANNEL' >> $BASH_ENV;
+              elif [[ "${CIRCLE_BRANCH}" = "staging" || "${CIRCLE_BRANCH}" = "production" ]]; then 
+                echo "BRANCH ${CIRCLE_BRANCH}"
+                echo 'export SLACK_CHANNEL_TARGET="${SLACK_CHANNEL},${SLACK_CHANNEL2}"' >> $BASH_ENV; 
+              fi
 
-      - run:
-          name: Print Slack target channel
-          command: | 
-            echo "Target channel ${SLACK_CHANNEL_TARGET}"
+        - run:
+            name: Print Slack target channel
+            command: | 
+              echo "Target channel ${SLACK_CHANNEL_TARGET}"
 
-  set_pull_request_branch:
-    steps:
-      - run:
-          name: Getting target branch
-          command: |
-            # Default branch to avoid issues.
-            target_branch="master"
-            echo "export LG_PR_TARGET=$target_branch" >> "$BASH_ENV"
+    set_pull_request_branch:
+      steps:
+        - run:
+            name: Getting target branch
+            command: |
+              # Default branch to avoid issues.
+              target_branch="master"
+              echo "export LG_PR_TARGET=$target_branch" >> "$BASH_ENV"
 
-  notify_slack_error:
-    steps:
-      - slack/notify:
-          branch_pattern: "master|staging|production"
-          event: fail
-          channel: $SLACK_CHANNEL_TARGET
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "Job Failed. :red_circle:",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Job*: ${CIRCLE_JOB}"
+    notify_slack_error:
+      steps:
+        - slack/notify:
+            branch_pattern: "master|staging|production"
+            event: fail
+            channel: $SLACK_CHANNEL_TARGET
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Job Failed. :red_circle:",
+                      "emoji": true
                     }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Project*: $CIRCLE_PROJECT_REPONAME"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch*: $CIRCLE_BRANCH"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Message*: $COMMIT_MESSAGE"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Author*: $CIRCLE_USERNAME"
-                    }
-                  ],
-                  "accessory": {
-                    "type": "image",
-                    "image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
-                    "alt_text": "CircleCI logo"
-                  }
-                },
-                {
-                  "type": "actions",
-                  "elements": [ {
-                      "type": "button",
-                      "action_id": "basic_fail_view",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "View Job"
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Job*: ${CIRCLE_JOB}"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Project*: $CIRCLE_PROJECT_REPONAME"
                       },
-                      "url": "${CIRCLE_BUILD_URL}"
-                    }
-                  ]
-                }
-              ]
-            }
-
-  notify_slack_pass:
-    steps:
-      - slack/notify:
-          branch_pattern: "master|staging|production"
-          event: pass
-          channel: $SLACK_CHANNEL_TARGET
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "Job Succeeded. :white_check_mark:",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Job*: ${CIRCLE_JOB}"
-                    }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Project*: $CIRCLE_PROJECT_REPONAME"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch*: $CIRCLE_BRANCH"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Message*: $COMMIT_MESSAGE"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Author*: $CIRCLE_USERNAME"
-                    }
-                  ],
-                  "accessory": {
-                    "type": "image",
-                    "image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
-                    "alt_text": "CircleCI logo"
-                  }
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "action_id": "basic_success_view", "text": { "type": "plain_text",
-                        "text": "View Job"
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Branch*: $CIRCLE_BRANCH"
                       },
-                      "url": "${CIRCLE_BUILD_URL}"
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Message*: $COMMIT_MESSAGE"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Author*: $CIRCLE_USERNAME"
+                      }
+                    ],
+                    "accessory": {
+                      "type": "image",
+                      "image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+                      "alt_text": "CircleCI logo"
                     }
-                  ]
-                }
-              ]
-            }
+                  },
+                  {
+                    "type": "actions",
+                    "elements": [ {
+                        "type": "button",
+                        "action_id": "basic_fail_view",
+                        "text": {
+                          "type": "plain_text",
+                          "text": "View Job"
+                        },
+                        "url": "${CIRCLE_BUILD_URL}"
+                      }
+                    ]
+                  }
+                ]
+              }
+
+    notify_slack_pass:
+      steps:
+        - slack/notify:
+            branch_pattern: "master|staging|production"
+            event: pass
+            channel: $SLACK_CHANNEL_TARGET
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Job Succeeded. :white_check_mark:",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Job*: ${CIRCLE_JOB}"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Project*: $CIRCLE_PROJECT_REPONAME"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Branch*: $CIRCLE_BRANCH"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Message*: $COMMIT_MESSAGE"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Author*: $CIRCLE_USERNAME"
+                      }
+                    ],
+                    "accessory": {
+                      "type": "image",
+                      "image_url": "https://assets.brandfolder.com/otz5mn-bw4j2w-6jzqo8/original/circle-logo-badge-black.png",
+                      "alt_text": "CircleCI logo"
+                    }
+                  },
+                  {
+                    "type": "actions",
+                    "elements": [
+                      {
+                        "type": "button",
+                        "action_id": "basic_success_view", "text": { "type": "plain_text",
+                          "text": "View Job"
+                        },
+                        "url": "${CIRCLE_BUILD_URL}"
+                      }
+                    ]
+                  }
+                ]
+              }
 
 jobs:
-  validate:
-    executor: ubuntu-executor
-    # docker:
-    #   - image: cimg/node:16.14-browsers
-    steps:
-      # Install Terraform
-      - run:
-          name: Install Terraform
-          command: |
-            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            sudo mv terraform /usr/local/bin/
-            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+    validate:
+      executor: ubuntu-executor
+      # docker:
+      #   - image: cimg/node:16.14-browsers
+      steps:
+        # Install Terraform
+        - run:
+            name: Install Terraform
+            command: |
+              TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+              curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+              unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+              sudo mv terraform /usr/local/bin/
+              rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
-      # Configure AWS credentials
-      - run:
-          name: Configure AWS credentials
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
-      - checkout
-      - set_pull_request_branch
-      - run:
-          name: "Initialize resources"
-          command: ./scripts/terraform init
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .terraform
-            - .terraform.lock.hcl
-            - environments
-            - modules
-            - scripts
-            - shared
-            - tfstates
-      - checkout
-
-      - set_commit_message
-
-      - set_slack_target_channel
-
-      - notify_slack_error
-      - notify_slack_pass
-
-  plan:
-    executor: ubuntu-executor
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Install Terraform
-          command: |
-            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            sudo mv terraform /usr/local/bin/
-            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-
-      # Configure AWS credentials
-      - run:
-          name: Configure AWS credentials
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
-      - set_pull_request_branch
-      - run:
-          name: "Plan changes"
-          command: ./scripts/terraform plan
-
-      - run:
-          name: verifying2
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
-
-      - run:
-          name: verifying canarie1
-          command: ls /home/circleci/project/environments/root/canaries_code/nextcloud
-
-      - run:
-          name: verifying canarie2
-          command: ls /home/circleci/project/environments/root/canaries_code/nextcloud/code
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - environments/*/tfplan
-            - environments/*/lambdas_code/*
-            - environments/*/lambdas_test/*
-            - environments/*/canaries_code/* 
-  apply:
-    executor: ubuntu-executor
-    steps:
-      - attach_workspace:
-          at: .
-      - set_pull_request_branch
-      - run:
-          name: Install Terraform
-          command: |
-            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            sudo mv terraform /usr/local/bin/
-            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-
-      # Configure AWS credentials
-      - run:
-          name: Configure AWS credentials
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
-
-      - run:
-          name: verifying lambda
-          command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
-
-      - run:
-          name: verifying canarie1
-          command: ls /home/circleci/project/environments/root/canaries_code/nextcloud
-
-      - run:
-          name: verifying canarie2
-          command: ls /home/circleci/project/environments/root/canaries_code/nextcloud/code
-
-      - run:
-          name: "Apply changes"
-          command: scripts/terraform apply  
-
-  destroy:
-    executor: ubuntu-executor
-    steps:
-      - attach_workspace:
-          at: .
-      - set_pull_request_branch
-      - run:
-          name: Install Terraform
-          command: |
-            TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-            curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            sudo mv terraform /usr/local/bin/
-            rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-
-      # Configure AWS credentials
-      - run:
-          name: Configure AWS credentials
-          command: |
-            echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-            source $BASH_ENV
-
-      - run:
-          name: "destroy changes"
-          command: scripts/terraform destroy  
-
-  testing:
-    executor: ubuntu-executor
-    steps:
-      - checkout
-      - run:
-          name: Install Terraform
-          command: |
-            if [ << pipeline.parameters.ENABLE_TESTS >> = true ]; then
-              ./tests.sh
-            else
-              exit 0
-            fi
-
-  deploy:
-    docker:
-        - image: google/cloud-sdk:352.0.0
-
-    steps:
+        # Configure AWS credentials
+        - run:
+            name: Configure AWS credentials
+            command: |
+              echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+              echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+              source $BASH_ENV
+        - checkout
+        - set_pull_request_branch
+        - run:
+            name: "Initialize resources"
+            command: ./scripts/terraform init
+        - persist_to_workspace:
+            root: .
+            paths:
+              - .terraform
+              - .terraform.lock.hcl
+              - environments
+              - modules
+              - scripts
+              - shared
+              - tfstates
         - checkout
 
+        - set_commit_message
+
+        - set_slack_target_channel
+
+        - notify_slack_error
+        - notify_slack_pass
+
+    plan:
+      executor: ubuntu-executor
+      steps:
+        - attach_workspace:
+            at: .
         - run:
-              name: Install AWS cli
-              command: |
-                  apt-get update
-                  apt-get install -y python-setuptools python3-pip
-                  pip install awscli
-                  aws configure set preview.cloudfront true
+            name: Install Terraform
+            command: |
+              TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+              curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+              unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+              sudo mv terraform /usr/local/bin/
+              rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+
+        # Configure AWS credentials
         - run:
-              name: Install Node.js libraries
-              command: |
-                  npm set progress=false
-                  sudo npm install -g firebase-tools@8.6.0
+            name: Configure AWS credentials
+            command: |
+              echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+              echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+              source $BASH_ENV
+        - set_pull_request_branch
+        - run:
+            name: "Plan changes"
+            command: ./scripts/terraform plan
+
+        - run:
+            name: verifying2
+            command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
+
+        - run:
+            name: verifying canarie1
+            command: ls /home/circleci/project/environments/root/canaries_code/nextcloud
+
+        - run:
+            name: verifying canarie2
+            command: ls /home/circleci/project/environments/root/canaries_code/nextcloud/code
+
+        - persist_to_workspace:
+            root: .
+            paths:
+              - environments/*/tfplan
+              - environments/*/lambdas_code/*
+              - environments/*/lambdas_test/*
+              - environments/*/canaries_code/* 
+    apply:
+      executor: ubuntu-executor
+      steps:
+        - attach_workspace:
+            at: .
+        - set_pull_request_branch
+        - run:
+            name: Install Terraform
+            command: |
+              TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+              curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+              unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+              sudo mv terraform /usr/local/bin/
+              rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+
+        # Configure AWS credentials
+        - run:
+            name: Configure AWS credentials
+            command: |
+              echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+              echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+              source $BASH_ENV
+
+        - run:
+            name: verifying lambda
+            command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
+
+        - run:
+            name: verifying canarie1
+            command: ls /home/circleci/project/environments/root/canaries_code/nextcloud
+
+        - run:
+            name: verifying canarie2
+            command: ls /home/circleci/project/environments/root/canaries_code/nextcloud/code
+
+        - run:
+            name: "Apply changes"
+            command: scripts/terraform apply  
+
+    destroy:
+      executor: ubuntu-executor
+      steps:
+        - attach_workspace:
+            at: .
+        - set_pull_request_branch
+        - run:
+            name: Install Terraform
+            command: |
+              TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+              curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+              unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+              sudo mv terraform /usr/local/bin/
+              rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+
+        # Configure AWS credentials
+        - run:
+            name: Configure AWS credentials
+            command: |
+              echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+              echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+              source $BASH_ENV
+
+        - run:
+            name: "destroy changes"
+            command: scripts/terraform destroy  
+
+    testing:
+      executor: ubuntu-executor
+      steps:
+        - checkout
+        - run:
+            name: Install Terraform
+            command: |
+              if [ << pipeline.parameters.ENABLE_TESTS >> = true ]; then
+                ./tests.sh
+              else
+                exit 0
+              fi
+
+    deploy:
+      docker:
+          - image: google/cloud-sdk:352.0.0
+
+      steps:
+          - checkout
+
+          - run:
+                name: Install AWS cli
+                command: |
+                    apt-get update
+                    apt-get install -y python-setuptools python3-pip
+                    pip install awscli
+                    aws configure set preview.cloudfront true
+          - run:
+                name: Install Node.js libraries
+                command: |
+                    npm set progress=false
+                    sudo npm install -g firebase-tools@8.6.0
+
+          - set_commit_message
+
+          - set_slack_target_channel
+
+          - notify_slack_error
+          - notify_slack_pass
 
 workflows:
-  validate_and_plan:
-    jobs:
-      # - testing
-      # - validate:
-      - deploy:
-          context:
-            -org-global
-          post-steps:
-            - when:
-                condition:
-                  equal: [master, << pipeline.git.branch >>]
-                steps:
-                  - jira/notify:
-                      job_type: deployment
-                      environment: Testing
-                      environment_type: testing
-            - when:
-                condition:
-                  equal: [staging, << pipeline.git.branch >>]
-                steps:
-                  - jira/notify:
-                      job_type: deployment
-                      environment: Staging
-                      environment_type: staging
-      # - plan:
-      #     requires:
-      #       - validate
-      # - apply:
-      #     requires:
-      #       - plan
-      # - destroy:
-      #     requires:
-      #       - apply
+    validate_and_plan:
+      jobs:
+        # - testing
+        # - validate:
+        - deploy:
+            context:
+              -org-global
+            post-steps:
+              - when:
+                  condition:
+                    equal: [master, << pipeline.git.branch >>]
+                  steps:
+                    - jira/notify:
+                        job_type: deployment
+                        environment: Testing
+                        environment_type: testing
+              - when:
+                  condition:
+                    equal: [staging, << pipeline.git.branch >>]
+                  steps:
+                    - jira/notify:
+                        job_type: deployment
+                        environment: Staging
+                        environment_type: staging
+        # - plan:
+        #     requires:
+        #       - validate
+        # - apply:
+        #     requires:
+        #       - plan
+        # - destroy:
+        #     requires:
+        #       - apply

@@ -37,3 +37,9 @@ variable "subnet_id" {
   description = "Subnet id where the EC2 instance is going to be deployed"
 }
 
+variable "ingress_with_source_security_group_id" {
+  description = "List of ingress rules to create where 'source_security_group_id' is used"
+  type        = list(map(string))
+  default     = []
+}
+

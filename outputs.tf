@@ -7,6 +7,6 @@
 # }
 
 
-output "source_code_hash" {
-  value = module.canary.source_code_hash
-}
+# output "source_code_hash" {
+#   value = module.canary.source_code_hash
+# }

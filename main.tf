@@ -15,16 +15,118 @@ module "vpc_networking" {
 
 }
 
-# module "ec2_ubuntu" {
-#   source = "./modules/ec2_ubuntu"
+module "rds-dataddo-sg" {
+  source      = "terraform-aws-modules/security-group/aws"
+  version     = "4.17.1"
+  name        = "rds-dataddo-sg"
+  description = "Allow dataddo IPs service"
+  vpc_id      = module.vpc_networking.vpc_id
 
-#   vpc_id        = module.vpc_networking.vpc_id
-#   path_to_key   = "keys/mykey.pub"
-#   ec2_name      = "ec2 bastion host"
-#   instance_type = "t3.micro"
-#   subnet_id     = module.vpc_networking.public_subnets_ids[1]
+  ingress_cidr_blocks = [
+    "52.210.57.95/32",
+    "52.17.68.150/32",
+    "52.214.115.147/32",
+    "54.77.45.35/32",
+    "52.30.37.137/32",
+    "18.200.46.19/32"
+  ]
 
-# }
+  ingress_rules       = ["postgresql-tcp"]
+
+  egress_cidr_blocks  = ["0.0.0.0/0"]
+  egress_rules        = ["all-all"]
+}
+
+module "rds-retool-sg" {
+  source      = "terraform-aws-modules/security-group/aws"
+  version     = "4.17.1"
+  name        = "rds-retool-sg"
+  description = "Allow Retool IPs service"
+  vpc_id      = module.vpc_networking.vpc_id
+
+  ingress_cidr_blocks = [
+    "44.208.168.68/30",
+    "35.90.103.132/30"
+  ]
+
+  ingress_rules       = ["postgresql-tcp"]
+
+  egress_cidr_blocks  = ["0.0.0.0/0"]
+  egress_rules        = ["all-all"]
+}
+
+module "rds-dbt-sg" {
+  source      = "terraform-aws-modules/security-group/aws"
+  version     = "4.17.1"
+  name        = "rds-dbt-sg"
+  description = "Allow DBT IPs service"
+  vpc_id      = module.vpc_networking.vpc_id
+
+  ingress_cidr_blocks = [
+    "3.126.140.248/32",
+    "52.45.144.63/32",
+    "3.72.153.148/32",
+    "3.123.45.39/32",
+    "54.81.134.249/32",
+    "52.22.161.231/32"
+  ]
+
+  ingress_rules       = ["postgresql-tcp"]
+
+  egress_cidr_blocks  = ["0.0.0.0/0"]
+  egress_rules        = ["all-all"]
+}
+
+module "rds-vpc-sg" {
+  source      = "terraform-aws-modules/security-group/aws"
+  version     = "4.17.1"
+  name        = "rds-vpc-sg"
+  description = "Allow from internal VPC"
+  vpc_id      = module.vpc_networking.vpc_id
+
+  ingress_cidr_blocks = [
+    "172.17.160.0/20"
+  ]
+
+  ingress_rules       = ["postgresql-tcp"]
+
+  egress_cidr_blocks  = ["0.0.0.0/0"]
+  egress_rules        = ["all-all"]
+}
+
+module "ec2_ubuntu" {
+  source = "./modules/ec2_ubuntu"
+
+  vpc_id        = module.vpc_networking.vpc_id
+  path_to_key   = "keys/mykey.pub"
+  ec2_name      = "ec2 bastion host"
+  instance_type = "t3.micro"
+  subnet_id     = module.vpc_networking.public_subnets_ids[1]
+
+  ingress_with_source_security_group_id = [
+    {
+      description              = "datadoo"
+      rule                     = "postgresql-tcp"
+      source_security_group_id = module.rds-dataddo-sg.security_group_id
+    },
+    {
+      description              = "retool"
+      rule                     = "postgresql-tcp"
+      source_security_group_id = module.rds-retool-sg.security_group_id
+    },
+    {
+      description              = "Access for DBT"
+      rule                     = "postgresql-tcp"
+      source_security_group_id = module.rds-dbt-sg.security_group_id
+    },
+    {
+      description              = "Allow from internal VPC"
+      rule                     = "postgresql-tcp"
+      source_security_group_id = module.rds-vpc-sg.security_group_id
+    }
+  ]
+
+}
 
 # module "rds-prod" {
 #   source = "./modules/rds"
@@ -171,79 +273,123 @@ module "vpc_networking" {
 
 # }
 
-module "alb" {
-  source = "./modules/alb"
+# module "alb" {
+#   source = "./modules/alb"
 
-  vpc_id        = module.vpc_networking.vpc_id
-  environment   = "Production"
-  internal      = "false"
-  subnets_ids     = module.vpc_networking.public_subnets_ids
+#   vpc_id        = module.vpc_networking.vpc_id
+#   environment   = "Production"
+#   internal      = "false"
+#   subnets_ids     = module.vpc_networking.public_subnets_ids
 
-}
+# }
 
-module "nextcloud-ecs" {
-    source = "./modules/ecs"
-    create = true
+# module "nextcloud-ecs" {
+#     source = "./modules/ecs"
+#     create = true
 
-    # Network/Account Settings
-    vpc_id = module.vpc_networking.vpc_id
-    private_subnets = module.vpc_networking.private_subnets_ids # Where be located the tasks.
-    alb = module.alb # LoadBalancer
+#     # Network/Account Settings
+#     vpc_id = module.vpc_networking.vpc_id
+#     private_subnets = module.vpc_networking.private_subnets_ids # Where be located the tasks.
+#     alb = module.alb # LoadBalancer
 
-    target_group_arn = module.alb.nextcloud-tg-arn
+#     target_group_arn = module.alb.nextcloud-tg-arn
 
-    # Task Degfinition (Per Componente)
-    task_web_port = 80 ## This must match with the por specified in 0.0.0.0:8000
-    desired_tasks = 1
-    alb_sg_id = module.alb.alb-sg.id
-   
-  depends_on = [
-    module.alb
-  ]
-}
+#     # Task Degfinition (Per Componente)
+#     task_web_port = 80 ## This must match with the por specified in 0.0.0.0:8000
+#     desired_tasks = 1
+#     alb_sg_id = module.alb.alb-sg.id
+#    
+#   depends_on = [
+#     module.alb
+#   ]
+# }
 
-module "snstux" {
-  source = "./modules/sns"
-}
+# module "snstux" {
+#   source = "./modules/sns"
+# }
 
-module "canary" {
-  source = "./modules/synthethics_canaries"
+# module "canary" {
+#   source = "./modules/synthethics_canaries"
 
-  relative_path = "/home/tux/Projects/AWS/practice/ec2_rds_bastion_host"
-  source_dir = "canaries_code/nextcloud"
-  canary_name = "nextcloud"
-  vpc_id = module.vpc_networking.vpc_id 
-  private_subnets_ids  = module.vpc_networking.private_subnets_ids
-  private_subnet_cidr = module.vpc_networking.private_subnets_cidr
-  alb_security_group_id = module.alb.alb-sg.id
-  artifact_s3_location = "s3://cwt-syn-results-881422822893-us-east-1/canary/us-east-1/nextcloud"
-  handler              = "main.handler"
-  runtime_version      = "syn-python-selenium-1.3"
-  start_canary = true
-  expression = "rate(5 minutes)"
+#   relative_path = "/home/tux/Projects/AWS/practice/ec2_rds_bastion_host"
+#   source_dir = "canaries_code/nextcloud"
+#   canary_name = "nextcloud"
+#   vpc_id = module.vpc_networking.vpc_id 
+#   private_subnets_ids  = module.vpc_networking.private_subnets_ids
+#   private_subnet_cidr = module.vpc_networking.private_subnets_cidr
+#   alb_security_group_id = module.alb.alb-sg.id
+#   artifact_s3_location = "s3://cwt-syn-results-881422822893-us-east-1/canary/us-east-1/nextcloud"
+#   handler              = "main.handler"
+#   runtime_version      = "syn-python-selenium-1.3"
+#   start_canary = true
+#   expression = "rate(5 minutes)"
 
-  depends_on = [
-    module.alb,
-    module.nextcloud-ecs
-  ]
-}
+#   depends_on = [
+#     module.alb,
+#     module.nextcloud-ecs
+#   ]
+# }
 
-module "alarm" {
-  source = "./modules/alarms"
+# module "alarm" {
+#   source = "./modules/alarms"
 
-  alarm_name                = "Synthetics-Alarm-nextcloud"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = 1
-  metric_name               = "Failed"
-  namespace                 = "CloudWatchSynthetics"
-  period                    = 900
-  statistic                 = "Sum"
-  threshold                 = 2.0
-  dimensions_name            = "CanaryName"
-  dimensions_value           = module.canary.cloudwatch_canary.name
-  alarm_actions = [module.snstux.aws_sns_topic_arn]
+#   alarm_name                = "Synthetics-Alarm-nextcloud"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   evaluation_periods        = 1
+#   metric_name               = "Failed"
+#   namespace                 = "CloudWatchSynthetics"
+#   period                    = 900
+#   statistic                 = "Sum"
+#   threshold                 = 2.0
+#   dimensions_name            = "CanaryName"
+#   dimensions_value           = module.canary.cloudwatch_canary.name
+#   alarm_actions = [module.snstux.aws_sns_topic_arn]
 
-  depends_on = [
-    module.canary
-  ]
-}
+#   depends_on = [
+#     module.canary
+#   ]
+# }
+
+# module "wazuh-server" {
+#   source      = "terraform-aws-modules/security-group/aws"
+#   version     = "4.16.1"
+#   name        = "logging-wazu-server"
+#   description = "Default security group for Wazuh"
+#   vpc_id      = module.vpc_networking.vpc_id
+
+#   ingress_cidr_blocks = [
+#     "52.30.0.0/16",
+#     "52.16.0.0/21",
+#   ]
+#   ingress_rules       = ["postgresql-tcp"]
+#   egress_cidr_blocks  = ["0.0.0.0/0"]
+#   egress_rules        = ["all-all"]
+# }
+
+# data "aws_security_group" "selected" {
+#   id = "sg-03e2897d0a45e8b75"
+# }
+
+# module "wazuh2-server" {
+#   source      = "terraform-aws-modules/security-group/aws"
+#   version     = "4.16.1"
+#   name        = "logging-wazu2-server"
+#   description = "Default security group for Wazuh"
+#   vpc_id      = module.vpc_networking.vpc_id
+
+#   ingress_cidr_blocks = [
+#     "101.0.0.0/16",
+#     "10.0.0.0/16",
+#   ]
+
+#   ingress_with_source_security_group_id = [
+#     {
+#       description              = "datadoo"
+#       rule                     = "http-80-tcp"
+#       source_security_group_id = data.aws_security_group.selected.id
+#     },
+#   ]
+#   ingress_rules       = ["postgresql-tcp"]
+#   egress_cidr_blocks  = ["0.0.0.0/0"]
+#   egress_rules        = ["all-all"]
+# }
