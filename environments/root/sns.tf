@@ -1,3 +1,3 @@
-module "snstux" {
-  source = "../../modules/sns"
-}
+# module "snstux" {
+#   source = "../../modules/sns"
+# }

@@ -15,118 +15,118 @@ module "vpc_networking" {
 
 }
 
-module "rds-dataddo-sg" {
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "4.17.1"
-  name        = "rds-dataddo-sg"
-  description = "Allow dataddo IPs service"
-  vpc_id      = module.vpc_networking.vpc_id
+# module "rds-dataddo-sg" {
+#   source      = "terraform-aws-modules/security-group/aws"
+#   version     = "4.17.1"
+#   name        = "rds-dataddo-sg"
+#   description = "Allow dataddo IPs service"
+#   vpc_id      = module.vpc_networking.vpc_id
 
-  ingress_cidr_blocks = [
-    "52.210.57.95/32",
-    "52.17.68.150/32",
-    "52.214.115.147/32",
-    "54.77.45.35/32",
-    "52.30.37.137/32",
-    "18.200.46.19/32"
-  ]
+#   ingress_cidr_blocks = [
+#     "52.210.57.95/32",
+#     "52.17.68.150/32",
+#     "52.214.115.147/32",
+#     "54.77.45.35/32",
+#     "52.30.37.137/32",
+#     "18.200.46.19/32"
+#   ]
 
-  ingress_rules       = ["postgresql-tcp"]
+#   ingress_rules       = ["postgresql-tcp"]
 
-  egress_cidr_blocks  = ["0.0.0.0/0"]
-  egress_rules        = ["all-all"]
-}
+#   egress_cidr_blocks  = ["0.0.0.0/0"]
+#   egress_rules        = ["all-all"]
+# }
 
-module "rds-retool-sg" {
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "4.17.1"
-  name        = "rds-retool-sg"
-  description = "Allow Retool IPs service"
-  vpc_id      = module.vpc_networking.vpc_id
+# module "rds-retool-sg" {
+#   source      = "terraform-aws-modules/security-group/aws"
+#   version     = "4.17.1"
+#   name        = "rds-retool-sg"
+#   description = "Allow Retool IPs service"
+#   vpc_id      = module.vpc_networking.vpc_id
 
-  ingress_cidr_blocks = [
-    "44.208.168.68/30",
-    "35.90.103.132/30"
-  ]
+#   ingress_cidr_blocks = [
+#     "44.208.168.68/30",
+#     "35.90.103.132/30"
+#   ]
 
-  ingress_rules       = ["postgresql-tcp"]
+#   ingress_rules       = ["postgresql-tcp"]
 
-  egress_cidr_blocks  = ["0.0.0.0/0"]
-  egress_rules        = ["all-all"]
-}
+#   egress_cidr_blocks  = ["0.0.0.0/0"]
+#   egress_rules        = ["all-all"]
+# }
 
-module "rds-dbt-sg" {
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "4.17.1"
-  name        = "rds-dbt-sg"
-  description = "Allow DBT IPs service"
-  vpc_id      = module.vpc_networking.vpc_id
+# module "rds-dbt-sg" {
+#   source      = "terraform-aws-modules/security-group/aws"
+#   version     = "4.17.1"
+#   name        = "rds-dbt-sg"
+#   description = "Allow DBT IPs service"
+#   vpc_id      = module.vpc_networking.vpc_id
 
-  ingress_cidr_blocks = [
-    "3.126.140.248/32",
-    "52.45.144.63/32",
-    "3.72.153.148/32",
-    "3.123.45.39/32",
-    "54.81.134.249/32",
-    "52.22.161.231/32"
-  ]
+#   ingress_cidr_blocks = [
+#     "3.126.140.248/32",
+#     "52.45.144.63/32",
+#     "3.72.153.148/32",
+#     "3.123.45.39/32",
+#     "54.81.134.249/32",
+#     "52.22.161.231/32"
+#   ]
 
-  ingress_rules       = ["postgresql-tcp"]
+#   ingress_rules       = ["postgresql-tcp"]
 
-  egress_cidr_blocks  = ["0.0.0.0/0"]
-  egress_rules        = ["all-all"]
-}
+#   egress_cidr_blocks  = ["0.0.0.0/0"]
+#   egress_rules        = ["all-all"]
+# }
 
-module "rds-vpc-sg" {
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "4.17.1"
-  name        = "rds-vpc-sg"
-  description = "Allow from internal VPC"
-  vpc_id      = module.vpc_networking.vpc_id
+# module "rds-vpc-sg" {
+#   source      = "terraform-aws-modules/security-group/aws"
+#   version     = "4.17.1"
+#   name        = "rds-vpc-sg"
+#   description = "Allow from internal VPC"
+#   vpc_id      = module.vpc_networking.vpc_id
 
-  ingress_cidr_blocks = [
-    "172.17.160.0/20"
-  ]
+#   ingress_cidr_blocks = [
+#     "172.17.160.0/20"
+#   ]
 
-  ingress_rules       = ["postgresql-tcp"]
+#   ingress_rules       = ["postgresql-tcp"]
 
-  egress_cidr_blocks  = ["0.0.0.0/0"]
-  egress_rules        = ["all-all"]
-}
+#   egress_cidr_blocks  = ["0.0.0.0/0"]
+#   egress_rules        = ["all-all"]
+# }
 
-module "ec2_ubuntu" {
-  source = "./modules/ec2_ubuntu"
+# module "ec2_ubuntu" {
+#   source = "./modules/ec2_ubuntu"
 
-  vpc_id        = module.vpc_networking.vpc_id
-  path_to_key   = "keys/mykey.pub"
-  ec2_name      = "ec2 bastion host"
-  instance_type = "t3.micro"
-  subnet_id     = module.vpc_networking.public_subnets_ids[1]
+#   vpc_id        = module.vpc_networking.vpc_id
+#   path_to_key   = "keys/mykey.pub"
+#   ec2_name      = "ec2 bastion host"
+#   instance_type = "t3.micro"
+#   subnet_id     = module.vpc_networking.public_subnets_ids[1]
 
-  ingress_with_source_security_group_id = [
-    {
-      description              = "datadoo"
-      rule                     = "postgresql-tcp"
-      source_security_group_id = module.rds-dataddo-sg.security_group_id
-    },
-    {
-      description              = "retool"
-      rule                     = "postgresql-tcp"
-      source_security_group_id = module.rds-retool-sg.security_group_id
-    },
-    {
-      description              = "Access for DBT"
-      rule                     = "postgresql-tcp"
-      source_security_group_id = module.rds-dbt-sg.security_group_id
-    },
-    {
-      description              = "Allow from internal VPC"
-      rule                     = "postgresql-tcp"
-      source_security_group_id = module.rds-vpc-sg.security_group_id
-    }
-  ]
+#   ingress_with_source_security_group_id = [
+#     {
+#       description              = "datadoo"
+#       rule                     = "postgresql-tcp"
+#       source_security_group_id = module.rds-dataddo-sg.security_group_id
+#     },
+#     {
+#       description              = "retool"
+#       rule                     = "postgresql-tcp"
+#       source_security_group_id = module.rds-retool-sg.security_group_id
+#     },
+#     {
+#       description              = "Access for DBT"
+#       rule                     = "postgresql-tcp"
+#       source_security_group_id = module.rds-dbt-sg.security_group_id
+#     },
+#     {
+#       description              = "Allow from internal VPC"
+#       rule                     = "postgresql-tcp"
+#       source_security_group_id = module.rds-vpc-sg.security_group_id
+#     }
+#   ]
 
-}
+# }
 
 # module "rds-prod" {
 #   source = "./modules/rds"
@@ -304,9 +304,9 @@ module "ec2_ubuntu" {
 #   ]
 # }
 
-# module "snstux" {
-#   source = "./modules/sns"
-# }
+module "snstux" {
+  source = "./modules/sns"
+}
 
 # module "canary" {
 #   source = "./modules/synthethics_canaries"
@@ -330,25 +330,27 @@ module "ec2_ubuntu" {
 #   ]
 # }
 
-# module "alarm" {
-#   source = "./modules/alarms"
+module "alarm" {
+  source = "./modules/alarms"
 
-#   alarm_name                = "Synthetics-Alarm-nextcloud"
-#   comparison_operator       = "GreaterThanOrEqualToThreshold"
-#   evaluation_periods        = 1
-#   metric_name               = "Failed"
-#   namespace                 = "CloudWatchSynthetics"
-#   period                    = 900
-#   statistic                 = "Sum"
-#   threshold                 = 2.0
-#   dimensions_name            = "CanaryName"
-#   dimensions_value           = module.canary.cloudwatch_canary.name
-#   alarm_actions = [module.snstux.aws_sns_topic_arn]
+  alarm_name                = "Synthetics-Alarm-nextcloud"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = 1
+  metric_name               = "Failed"
+  namespace                 = "CloudWatchSynthetics"
+  period                    = 900
+  statistic                 = "Sum"
+  threshold                 = 2.0
+  dimensions_name            = "CanaryName"
+  # dimensions_value           = module.canary.cloudwatch_canary.name
+  dimensions_value           = "nextcloud"
+  alarm_actions = [module.snstux.aws_sns_topic_arn]
+  ok_actions          = [module.snstux.aws_sns_topic_arn]
 
-#   depends_on = [
-#     module.canary
-#   ]
-# }
+  # depends_on = [
+  #   module.canary
+  # ]
+}
 
 # module "wazuh-server" {
 #   source      = "terraform-aws-modules/security-group/aws"
