@@ -1,9 +1,9 @@
 version: 2.1
 
-# executors:
-#   ubuntu-executor:
-#     docker:
-#       - image: cimg/base:current-20.04
+executors:
+  ubuntu-executor:
+    docker:
+      - image: cimg/base:current-20.04
 
 orbs:
     terraform: circleci/terraform@3.0.0
