@@ -392,27 +392,27 @@ workflows:
     validate_and_plan:
       jobs:
         # - testing
-        # - validate:
-        - deploy:
-            context:
-              -org-global
-            post-steps:
-              - when:
-                  condition:
-                    equal: [master, << pipeline.git.branch >>]
-                  steps:
-                    - jira/notify:
-                        job_type: deployment
-                        environment: Testing
-                        environment_type: testing
-              - when:
-                  condition:
-                    equal: [staging, << pipeline.git.branch >>]
-                  steps:
-                    - jira/notify:
-                        job_type: deployment
-                        environment: Staging
-                        environment_type: staging
+        - validate
+        # - deploy:
+        #     context:
+        #       -org-global
+        #     post-steps:
+        #       - when:
+        #           condition:
+        #             equal: [master, << pipeline.git.branch >>]
+        #           steps:
+        #             - jira/notify:
+        #                 job_type: deployment
+        #                 environment: Testing
+        #                 environment_type: testing
+        #       - when:
+        #           condition:
+        #             equal: [staging, << pipeline.git.branch >>]
+        #           steps:
+        #             - jira/notify:
+        #                 job_type: deployment
+        #                 environment: Staging
+        #                 environment_type: staging
         # - plan:
         #     requires:
         #       - validate
