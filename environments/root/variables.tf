@@ -3,10 +3,5 @@ variable "aws_region" {
   type    = string
 }
 
-variable "private_subnets" {
-  type    = string
-}
-
 variable "private_subnets_cidr" {
-  type    = string
 }
