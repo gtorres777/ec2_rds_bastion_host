@@ -63,9 +63,9 @@ function _get_branch() {
 # This function is a wrapper around terraform binary to execute additional
 # steps before passing the params to the real terraform.
 function _terraform() {
-    echo "ENVIRONMENTS ACA"
-    echo $environments
     [ ! -d environments ] && echo "No environments" && exit 1
+    echo "ENVIRONMENTS ACA"
+    echo environments
     pushd environments
     # where d is the project inside environments,
     for project in */ ; do
