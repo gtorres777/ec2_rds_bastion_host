@@ -420,9 +420,9 @@ workflows:
         #                 job_type: deployment
         #                 environment: Staging
         #                 environment_type: staging
-        # - plan:
-        #     requires:
-        #       - validate
+        - plan:
+            requires:
+              - validate
         # - apply:
         #     requires:
         #       - plan
