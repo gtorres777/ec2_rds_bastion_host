@@ -195,32 +195,38 @@ jobs:
     validate:
       executor: ubuntu-executor
       steps:
+        - terraform/install:
+            terraform_version: "1.3.4"
+            arch: "amd64"
+            os: "linux"
+        - setup_remote_docker:
+            docker_layer_caching: true
         # Install Terraform
-        - run:
-            name: Install Terraform
-            command: |
-              TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-              curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-              unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-              sudo mv terraform /usr/local/bin/
-              rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+        # - run:
+        #     name: Install Terraform
+        #     command: |
+        #       TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+        #       curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+        #       unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+        #       sudo mv terraform /usr/local/bin/
+        #       rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
-        # Configure AWS credentials
-        - run:
-            name: Configure AWS credentials
-            command: |
-              echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-              echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-              source $BASH_ENV
+        # # Configure AWS credentials
+        # - run:
+        #     name: Configure AWS credentials
+        #     command: |
+        #       echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+        #       echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+        #       source $BASH_ENV
         - checkout
         - set_pull_request_branch
 
         - run:
-                  name: Install AWS cli
-                  command: |
-                      sudo apt-get update
-                      sudo apt-get install -y python-setuptools python3-pip
-                      sudo pip install awscli
+            name: Install AWS cli
+            command: |
+                sudo apt-get update
+                sudo apt-get install -y python-setuptools python3-pip
+                sudo pip install awscli
         - run:
             name: "Initialize resources"
             command: ./scripts/terraform init
@@ -248,22 +254,26 @@ jobs:
       steps:
         - attach_workspace:
             at: .
-        - run:
-            name: Install Terraform
-            command: |
-              TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
-              curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-              unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-              sudo mv terraform /usr/local/bin/
-              rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+        - terraform/install:
+            terraform_version: "1.3.4"
+            arch: "amd64"
+            os: "linux"
+        # - run:
+        #     name: Install Terraform
+        #     command: |
+        #       TERRAFORM_VERSION="1.3.4"  # Replace with the desired Terraform version
+        #       curl -LO "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+        #       unzip "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+        #       sudo mv terraform /usr/local/bin/
+        #       rm "terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
         # Configure AWS credentials
-        - run:
-            name: Configure AWS credentials
-            command: |
-              echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
-              echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
-              source $BASH_ENV
+        # - run:
+        #     name: Configure AWS credentials
+        #     command: |
+        #       echo 'export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID' >> $BASH_ENV
+        #       echo 'export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY' >> $BASH_ENV
+        #       source $BASH_ENV
         - set_pull_request_branch
         - run:
             name: "Plan changes"
