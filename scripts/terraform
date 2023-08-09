@@ -40,7 +40,7 @@ trap 'error_handler $? "${BASH_SOURCE}" "$LINENO" "$BASH_COMMAND"' EXIT
 function _get_branch() {
   project=$1
   echo "TF_vars"
-  echo $TF_VAR_private_subnets_cidr
+  echo TF_VAR_private_subnets_cidr
 
   case $CIRCLE_BRANCH in
     "master" | "staging" | "production")
