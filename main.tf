@@ -10,7 +10,8 @@ module "vpc_networking" {
 
   vpc_cidr = "11.0.0.0/16"
 
-  public_subnets_cidr      = ["11.0.1.0/24", "11.0.2.0/24"]
+  # public_subnets_cidr      = ["11.0.1.0/24", "11.0.2.0/24"]
+  public_subnets_cidr      = var.private_subnets_cidr
   private_subnets_rds_cidr = ["11.0.3.0/24", "11.0.4.0/24"]
 
 }
@@ -304,9 +305,9 @@ module "vpc_networking" {
 #   ]
 # }
 
-module "snstux" {
-  source = "./modules/sns"
-}
+# module "snstux" {
+#   source = "./modules/sns"
+# }
 
 # module "canary" {
 #   source = "./modules/synthethics_canaries"
@@ -330,27 +331,27 @@ module "snstux" {
 #   ]
 # }
 
-module "alarm" {
-  source = "./modules/alarms"
+# module "alarm" {
+#   source = "./modules/alarms"
 
-  alarm_name                = "Synthetics-Alarm-nextcloud"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = 1
-  metric_name               = "Failed"
-  namespace                 = "CloudWatchSynthetics"
-  period                    = 900
-  statistic                 = "Sum"
-  threshold                 = 2.0
-  dimensions_name            = "CanaryName"
-  # dimensions_value           = module.canary.cloudwatch_canary.name
-  dimensions_value           = "nextcloud"
-  alarm_actions = [module.snstux.aws_sns_topic_arn]
-  ok_actions          = [module.snstux.aws_sns_topic_arn]
+#   alarm_name                = "Synthetics-Alarm-nextcloud"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   evaluation_periods        = 1
+#   metric_name               = "Failed"
+#   namespace                 = "CloudWatchSynthetics"
+#   period                    = 900
+#   statistic                 = "Sum"
+#   threshold                 = 2.0
+#   dimensions_name            = "CanaryName"
+#   # dimensions_value           = module.canary.cloudwatch_canary.name
+#   dimensions_value           = "nextcloud"
+#   alarm_actions = [module.snstux.aws_sns_topic_arn]
+#   ok_actions          = [module.snstux.aws_sns_topic_arn]
 
   # depends_on = [
   #   module.canary
   # ]
-}
+# }
 
 # module "wazuh-server" {
 #   source      = "terraform-aws-modules/security-group/aws"
