@@ -41,6 +41,7 @@ function _get_branch() {
   project=$1
   echo "TF_vars"
   echo TF_VAR_private_subnets_cidr
+  printenv
 
   case $CIRCLE_BRANCH in
     "master" | "staging" | "production")
