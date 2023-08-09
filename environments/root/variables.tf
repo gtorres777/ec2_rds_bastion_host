@@ -3,5 +3,8 @@ variable "aws_region" {
   type    = string
 }
 
-variable "private_subnets_cidr" {
+variable "vpc_cidr" {
+}
+
+variable "public_subnets_cidr" {
 }

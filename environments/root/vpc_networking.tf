@@ -8,10 +8,11 @@ module "vpc_networking" {
   availability_zones = local.availability_zones
   aws_region         = var.aws_region
 
-  vpc_cidr = "11.0.0.0/16"
+  # vpc_cidr = "11.0.0.0/16"
+  vpc_cidr = var.vpc_cidr
 
   # public_subnets_cidr      = ["11.0.1.0/24", "11.0.2.0/24"]
-  public_subnets_cidr      =  var.private_subnets_cidr
+  public_subnets_cidr      =  var.public_subnets_cidr
   private_subnets_rds_cidr = ["11.0.3.0/24", "11.0.4.0/24"]
 
 }
