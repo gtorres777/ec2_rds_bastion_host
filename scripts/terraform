@@ -39,6 +39,8 @@ trap 'error_handler $? "${BASH_SOURCE}" "$LINENO" "$BASH_COMMAND"' EXIT
 # Look at .circleci/config.yml for LG_PR_TARGET and his definition.
 function _get_branch() {
   project=$1
+  echo "TF_vars"
+  echo $TF_VAR_private_subnets_cidr
 
   case $CIRCLE_BRANCH in
     "master" | "staging" | "production")
@@ -64,8 +66,6 @@ function _get_branch() {
 # steps before passing the params to the real terraform.
 function _terraform() {
     [ ! -d environments ] && echo "No environments" && exit 1
-    echo "ENVIRONMENTS ACA"
-    echo environments
     pushd environments
     # where d is the project inside environments,
     for project in */ ; do
