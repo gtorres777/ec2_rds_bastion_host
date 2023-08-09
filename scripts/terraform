@@ -39,10 +39,6 @@ trap 'error_handler $? "${BASH_SOURCE}" "$LINENO" "$BASH_COMMAND"' EXIT
 # Look at .circleci/config.yml for LG_PR_TARGET and his definition.
 function _get_branch() {
   project=$1
-  echo "TF_vars"
-  echo TF_VAR_private_subnets_cidr
-  printenv
-
   case $CIRCLE_BRANCH in
     "master" | "staging" | "production")
       export TF_VAR_private_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed 's/"//g')
