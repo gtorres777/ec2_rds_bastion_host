@@ -28,7 +28,7 @@ echo "-------"
 echo "-------"
 echo "-------"
 
-export MIPUB=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed 's/"//g')
+export MIPUB=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed s/\"//g)
 echo "MIPUB"
 echo $MIPUB
 
