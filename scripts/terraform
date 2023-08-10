@@ -21,7 +21,7 @@ TERRABIN=$(which terraform)
 echo "> $TERRABIN"
 BRANCH=${CIRCLE_BRANCH}
 
-export TF_VAR_public_subnets_cidr="["11.0.1.0/24", "11.0.2.0/24"]"
+export TF_VAR_public_subnets_cidr="[\"11.0.1.0/24\", \"11.0.2.0/24\"]"
 export TF_VAR_vpc_cidr="11.0.0.0/16"
 # export TF_VAR_private_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed 's/"//g')
 
