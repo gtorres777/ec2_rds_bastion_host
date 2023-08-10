@@ -21,24 +21,6 @@ TERRABIN=$(which terraform)
 echo "> $TERRABIN"
 BRANCH=${CIRCLE_BRANCH}
 
-echo "TESTING S3"
-aws s3 ls 
-
-echo "-------"
-echo "-------"
-echo "-------"
-
-export MIPUB=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-echo "MIPUB"
-echo $MIPUB
-
-export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-
-# export TF_VAR_vpc_cidr="11.0.0.0/16"
-# export TF_VAR_private_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed 's/"//g')
-
-printenv
 
 function error_handler()
 {
@@ -63,6 +45,8 @@ function _get_branch() {
       if [ -d "${project}${CIRCLE_BRANCH}" ] &&
          [ -f "${project}${CIRCLE_BRANCH}/terraform.tfvars" ] &&
          [ -f "${project}${CIRCLE_BRANCH}/backend.conf" ]; then
+        export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+        export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
         echo $CIRCLE_BRANCH
         return
       else
@@ -84,6 +68,8 @@ function _terraform() {
     pushd environments
     # where d is the project inside environments,
     for project in */ ; do
+        echo "PROJECTS"
+        echo $project
         # Validations
         [ -L "${project%/}" ] && echo "${project%/} its a link" && continue
         [ -z "${project}" ] && echo "${project} empty" && continue
