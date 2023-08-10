@@ -28,11 +28,11 @@ echo "-------"
 echo "-------"
 echo "-------"
 
-export MIPUB=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed 's/\\"/"/g')
+export MIPUB=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed 's/\\"/"/g' | sed 's/^\["\(.*\)"\]$/[\1]/')
 echo "MIPUB"
 echo $MIPUB
 
-export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed 's/\\"/"/g')
+export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter.Value" | sed 's/\\"/"/g' | sed 's/^\["\(.*\)"\]$/[\1]/')
 export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/vpc_cidr" --with-decryption --query "Parameter.Value")
 
 # export TF_VAR_vpc_cidr="11.0.0.0/16"
