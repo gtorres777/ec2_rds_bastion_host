@@ -40,8 +40,6 @@ trap 'error_handler $? "${BASH_SOURCE}" "$LINENO" "$BASH_COMMAND"' EXIT
 # Look at .circleci/config.yml for LG_PR_TARGET and his definition.
 function _get_branch() {
   project=$1
-  # export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-  # export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/$project/master/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
   case $CIRCLE_BRANCH in
     "master" | "staging" | "production")
       if [ -d "${project}${CIRCLE_BRANCH}" ] &&
@@ -84,6 +82,8 @@ function _terraform() {
         pwd
         ACTION=$(echo $ARGS | cut -d " " -f1)
         echo $ARGS
+        export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${project}/master/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+        export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${project}/master/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
         ${TERRABIN} ${ARGS}
         popd
     done
