@@ -83,8 +83,8 @@ function _terraform() {
         ACTION=$(echo $ARGS | cut -d " " -f1)
         echo $ARGS
         PROJECT_SANITIZED=$(echo "${project}" | sed 's/\/$//')
-        export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/root/master/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-        export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/master/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+        export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+        export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
         printenv
         ${TERRABIN} ${ARGS}
         popd
