@@ -82,10 +82,14 @@ function _terraform() {
         pwd
         ACTION=$(echo $ARGS | cut -d " " -f1)
         echo $ARGS
+
+        # Obtaining variables from AWS Param Store.
         PROJECT_SANITIZED=$(echo "${project}" | sed 's/\/$//')
         export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
         export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+        export TF_VAR_vpc_cidr2=$(aws ssm get-parameter --name "/leadgenius/terrafor/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
         printenv
+
         ${TERRABIN} ${ARGS}
         popd
     done
