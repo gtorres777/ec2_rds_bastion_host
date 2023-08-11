@@ -85,10 +85,43 @@ function _terraform() {
 
         # Obtaining variables from AWS Param Store.
         PROJECT_SANITIZED=$(echo "${project}" | sed 's/\/$//')
-        export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-        export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-        export TF_VAR_vpc_cidr2=$(aws ssm get-parameter --name "/leadgenius/terrafor/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-        printenv
+        case "$PROJECT_SANITIZED" in
+          'development')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr2=$(aws ssm get-parameter --name "/leadgenius/terrafor/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            printenv
+            ;;
+          'europe')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr2=$(aws ssm get-parameter --name "/leadgenius/terrafor/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            printenv
+            ;;
+          'experimental')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr2=$(aws ssm get-parameter --name "/leadgenius/terrafor/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            printenv
+            ;;
+          'logging')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr2=$(aws ssm get-parameter --name "/leadgenius/terrafor/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            printenv
+            ;;
+          'root')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr2=$(aws ssm get-parameter --name "/leadgenius/terrafor/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            printenv
+            ;;
+          *)
+            echo "Unknown project. Skip deployment"
+            exit 0
+            ;;
+        esac
+
 
         ${TERRABIN} ${ARGS}
         popd
