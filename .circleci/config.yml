@@ -222,13 +222,6 @@ jobs:
         - set_pull_request_branch
 
         - run:
-            name: Install AWS cli
-            command: |
-                sudo apt-get update
-                sudo apt-get install -y python-setuptools python3-pip
-                sudo pip install awscli
-
-        - run:
             name: "Initialize resources"
             command: ./scripts/terraform init
         - persist_to_workspace:
