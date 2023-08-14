@@ -112,7 +112,6 @@ function _terraform() {
             ;;
         esac
 
-
         ${TERRABIN} ${ARGS}
         popd
     done
@@ -135,7 +134,7 @@ case "$1" in
     ;;
 
   "plan")
-    _terraform plan -out=tfplan -var-file=terraform.tfvars
+    _terraform plan -out=tfplan
     ;;
 
   "apply")
