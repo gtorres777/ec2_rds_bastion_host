@@ -17,7 +17,8 @@ popd () {
         command popd "$@" > /dev/null
     fi
 }
-TERRABIN=$(which terraform) echo "> $TERRABIN"
+TERRABIN=$(which terraform)
+echo "> $TERRABIN"
 BRANCH=${CIRCLE_BRANCH}
 
 
@@ -81,8 +82,6 @@ function _terraform() {
         pwd
         ACTION=$(echo $ARGS | cut -d " " -f1)
         echo $ARGS
-
-        aws sts get-caller-identity
 
         # Obtaining variables from AWS Param Store.
         PROJECT_SANITIZED=$(echo "${project}" | sed 's/\/$//')
