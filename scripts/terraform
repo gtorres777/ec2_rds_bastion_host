@@ -82,6 +82,8 @@ function _terraform() {
         ACTION=$(echo $ARGS | cut -d " " -f1)
         echo $ARGS
 
+        aws sts get-caller-identity
+
         # Obtaining variables from AWS Param Store.
         PROJECT_SANITIZED=$(echo "${project}" | sed 's/\/$//')
         case "$PROJECT_SANITIZED" in
