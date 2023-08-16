@@ -5,6 +5,7 @@ module "alb" {
   environment   = "Production"
   internal      = "false"
   subnets_ids     = module.vpc_networking.public_subnets_ids
-  certificate_arn             = var.certificate_alb_private_arn   
+  certificate_arn   = null   
+  # certificate_arn   = var.certificate_alb_private_arn   
 
 }
