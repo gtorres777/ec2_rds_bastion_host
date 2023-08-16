@@ -18,3 +18,8 @@ variable "internal" {
 variable "subnets_ids" {
   description = "Subnets ids where the ALB instance is going to be deployed"
 }
+
+variable "certificate_arn" {
+  type = string
+  default = null
+}
