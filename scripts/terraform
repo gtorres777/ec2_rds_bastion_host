@@ -88,20 +88,12 @@ function _terraform() {
         PROJECT_SANITIZED=$(echo "${project}" | sed 's/\/$//')
         case "$PROJECT_SANITIZED" in
           'development')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
             ;;
           'europe')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
             ;;
           'experimental')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
             ;;
           'logging')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
             ;;
           'root')
             export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
@@ -114,7 +106,6 @@ function _terraform() {
             exit 0
             ;;
         esac
-
         ${TERRABIN} ${ARGS}
         popd
     done
