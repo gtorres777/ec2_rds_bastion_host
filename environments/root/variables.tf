@@ -13,4 +13,5 @@ variable "public_subnets_cidr" {
 
 variable "certificate_alb_private_arn" {
   type = string
+  default = null
 }
