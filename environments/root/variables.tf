@@ -12,6 +12,10 @@ variable "public_subnets_cidr" {
 }
 
 variable "certificate_alb_private_arn" {
-  type = string
-  default = null
+  type = any
+
+  validation {
+    condition     = can(tostring(var.certificate_alb_private_arn))
+    error_message = "The \"certificate_alb_private_arn\" value must be a string."
+  }
 }
