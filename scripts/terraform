@@ -97,7 +97,7 @@ function _terraform() {
           'root')
             export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
             export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value' | sed 's/null//g')
+            # export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value' | sed 's/null//g')
             printenv
             ;;
           *)
