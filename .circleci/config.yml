@@ -10,7 +10,7 @@ orbs:
     aws-parameter-store: circleci/aws-parameter-store@1.0.0
     slack: circleci/slack@4.3.0
     jira: circleci/jira@1.0.5
-    browser-tools: circleci/browser-tools@1.2.5
+    browser-tools: circleci/browser-tools@1.4.4
 
 parameters:
   ENABLE_TESTS:
