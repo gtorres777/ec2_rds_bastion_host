@@ -10,6 +10,7 @@ orbs:
     aws-parameter-store: circleci/aws-parameter-store@1.0.0
     slack: circleci/slack@4.3.0
     jira: circleci/jira@1.0.5
+    browser-tools: circleci/browser-tools@1.2.5
 
 parameters:
   ENABLE_TESTS:
@@ -370,14 +371,17 @@ jobs:
       executor: ubuntu-executor
       steps:
         - checkout
-        - run:
-            name: Install Terraform
-            command: |
-              if [ << pipeline.parameters.ENABLE_TESTS >> = true ]; then
-                ./tests.sh
-              else
-                exit 0
-              fi
+        # - run:
+        #     name: Install Terraform
+        #     command: |
+        #       if [ << pipeline.parameters.ENABLE_TESTS >> = true ]; then
+        #         ./tests.sh
+        #       else
+        #         exit 0
+        #       fi
+
+        - browser-tools/install-chrome
+        - browser-tools/install-chromedriver
 
     deploy:
       docker:
@@ -409,8 +413,8 @@ jobs:
 workflows:
     validate_and_plan:
       jobs:
-        # - testing
-        - validate
+        - testing
+        # - validate
         # - deploy:
         #     context:
         #       -org-global
@@ -431,12 +435,12 @@ workflows:
         #                 job_type: deployment
         #                 environment: Staging
         #                 environment_type: staging
-        - plan:
-            requires:
-              - validate
-        - apply:
-            requires:
-              - plan
-        - destroy:
-            requires:
-              - apply
+        # - plan:
+        #     requires:
+        #       - validate
+        # - apply:
+        #     requires:
+        #       - plan
+        # - destroy:
+        #     requires:
+        #       - apply
