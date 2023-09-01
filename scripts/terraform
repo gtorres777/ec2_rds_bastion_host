@@ -21,6 +21,7 @@ TERRABIN=$(which terraform)
 echo "> $TERRABIN"
 BRANCH=${CIRCLE_BRANCH}
 
+
 function error_handler()
 {
     if [ $1 -gt 0 ]; then
@@ -39,11 +40,9 @@ trap 'error_handler $? "${BASH_SOURCE}" "$LINENO" "$BASH_COMMAND"' EXIT
 # Look at .circleci/config.yml for LG_PR_TARGET and his definition.
 function _get_branch() {
   project=$1
-
   case $CIRCLE_BRANCH in
     "master" | "staging" | "production")
       if [ -d "${project}${CIRCLE_BRANCH}" ] &&
-         [ -f "${project}${CIRCLE_BRANCH}/terraform.tfvars" ] &&
          [ -f "${project}${CIRCLE_BRANCH}/backend.conf" ]; then
         echo $CIRCLE_BRANCH
         return
@@ -82,6 +81,40 @@ function _terraform() {
         pwd
         ACTION=$(echo $ARGS | cut -d " " -f1)
         echo $ARGS
+
+        # Obtaining variables from AWS Param Store.
+        PROJECT_SANITIZED=$(echo "${project}" | sed 's/\/$//')
+        case "$PROJECT_SANITIZED" in
+          'development')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
+            ;;
+          'europe')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
+            ;;
+          'experimental')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
+            ;;
+          'logging')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
+            ;;
+          'root')
+            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
+            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
+            ;;
+          *)
+            echo "Unknown project. Skip deployment"
+            exit 0
+            ;;
+        esac
         ${TERRABIN} ${ARGS}
         popd
     done
@@ -104,7 +137,7 @@ case "$1" in
     ;;
 
   "plan")
-    _terraform plan -out=tfplan -var-file=terraform.tfvars -var-file=BRANCH/terraform.tfvars
+    _terraform plan -out=tfplan
     ;;
 
   "apply")
@@ -112,7 +145,7 @@ case "$1" in
     ;;
 
   "destroy")
-    _terraform apply -destroy -auto-approve -var-file=terraform.tfvars -var-file=BRANCH/terraform.tfvars
+    _terraform apply -destroy -auto-approve 
     ;;
   *)
     echo "No instruction was given."
