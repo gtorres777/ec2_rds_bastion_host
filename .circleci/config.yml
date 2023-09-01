@@ -331,6 +331,13 @@ jobs:
               source $BASH_ENV
 
         - run:
+            name: Install AWS cli
+            command: |
+                sudo apt-get update
+                sudo apt-get install -y python-setuptools python3-pip
+                sudo pip install awscli
+
+        - run:
             name: verifying lambda
             command: ls /home/circleci/project/environments/root/lambdas_code/dms_stop_tasks
 
