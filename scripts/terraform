@@ -62,20 +62,16 @@ function _get_branch() {
 declare -A projects_and_variables=(
   ["development"]="
     vpc_cidr
-    certificate_alb_private_arn
-    private_subnets_cidr"
+    certificate_alb_private_arn"
   ["europe"]="
     vpc_cidr
-    certificate_alb_private_arn
-    private_subnets_cidr"
+    certificate_alb_private_arn"
   ["experimental"]="
     vpc_cidr
-    certificate_alb_private_arn
-    private_subnets_cidr"
+    certificate_alb_private_arn"
   ["root"]="
     vpc_cidr
-    certificate_alb_private_arn
-    private_subnets_cidr"
+    certificate_alb_private_arn"
 )
 
 # Function to fetch and set variables
