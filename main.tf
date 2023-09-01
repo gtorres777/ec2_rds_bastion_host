@@ -129,16 +129,16 @@ module "vpc_networking" {
 
 # }
 
-# module "rds-prod" {
-#   source = "./modules/rds"
+module "rds-prod" {
+  source = "./modules/rds"
 
-#   identifier = "rds-prod"
-#   vpc_id               = module.vpc_networking.vpc_id
-#   db_subnet_group_name = module.vpc_networking.aws_rds_subnet_group_id
-#   db_name              = "rdsprod"
-#   public_subnet_cidr = module.vpc_networking.public_subnets_cidr[1]
-#   rds_sg_name = "rds_sg_1"
-# }
+  identifier = "rds-prod"
+  vpc_id               = module.vpc_networking.vpc_id
+  db_subnet_group_name = module.vpc_networking.aws_rds_subnet_group_id
+  db_name              = "rdsprod"
+  public_subnet_cidr = module.vpc_networking.public_subnets_cidr[1]
+  rds_sg_name = "rds_sg_1"
+}
 
 # module "rds-staging" {
 #   source = "./modules/rds"
@@ -170,6 +170,73 @@ module "vpc_networking" {
 #     module.rds-staging
 #   ]
 # }
+
+module "alarm_dbload_classic" {
+  source = "./modules/alarms"
+
+  alarm_name                = "DBLoadClassic"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = 1
+  metric_name               = "DBLoad"
+  namespace                 = "CloudWatchSynthetics"
+  period                    = 60
+  statistic                 = "Maximum"
+  threshold                 = 100.0
+  dimensions_name           = "RDS DBLoad"
+  dimensions_value          = module.canary.cloudwatch_canary.name
+
+  alarm_actions             = []
+  ok_actions                = []
+
+  depends_on = [
+    module.canary
+  ]
+}
+
+module "alarm_dbload_anomaly" {
+  source = "./modules/alarms"
+
+  alarm_name                = "DBLoadAnomaly"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = 1
+  metric_name               = "DBLoad"
+  namespace                 = "CloudWatchSynthetics"
+  period                    = 60
+  statistic                 = "Maximum"
+
+  threshold_metric_id       = "e1"
+  metric_queries            = [
+    {
+      id                    = "e1"
+      expression            = "ANOMALY_DETECTION_BAND(m1)"
+      return_data           = "true"
+    },
+    {
+      id                    = "m1"
+      return_data           = "true"
+      metric                = [{
+
+        metric_name         = "DBLoad"
+        namespace           = "CloudWatchSynthetics"
+        period              = 60
+        statistic           = "Maximum"
+      }]
+    }
+  ]
+
+  alarm_actions             = []
+  ok_actions                = []
+}
+
+module "alarm_dbload_composite" {
+  source = "./modules/alarms-composite"
+
+  alarm_name                = "DBLoadComposite"
+  composite_alarm_rule      = "(ALARM(DBLoadClassic) AND ALARM(DBLoadAnomaly))"
+
+  alarm_actions             = ["arn:aws:sns:us-east-1:881422822893:Slack"]
+  ok_actions                = ["arn:aws:sns:us-east-1:881422822893:Slack"]
+}
 
 # module "endpoint-rds-staging" {
 #   source = "./modules/endpoint"

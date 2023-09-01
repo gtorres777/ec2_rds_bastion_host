@@ -48,3 +48,32 @@ variable "ok_actions" {
   type        = list(string)
   description = "The list of actions to execute when this alarm transitions into an OK state from any other state. Each action is specified as an Amazon Resource Name (ARN)."
 }
+
+# variable "threshold_metric_id" {
+#   type        = string
+#   default     = null
+#   description = "The ID of the metric query."
+# }
+
+# variable "metric_queries" {
+#   type = list(object({
+#     id          = optional(string)
+#     expression  = optional(string)
+#     return_data = optional(string)
+#     metric      = optional(list(object({
+#                     metric_name = string
+#                     namespace   = string
+#                     period      = number
+#                     statistic   = string
+#                   })))
+#   }))
+#   default = [ {
+#     metric = [ {
+#                     metric_name = null
+#                     namespace   = null
+#                     period      = null
+#                     statistic   = null
+#     } ]
+#   } ]
+#   description   = "List of metric queries for an alarm."
+# }

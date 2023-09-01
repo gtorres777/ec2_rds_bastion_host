@@ -413,8 +413,8 @@ jobs:
 workflows:
     validate_and_plan:
       jobs:
-        - testing
-        # - validate
+        # - testing
+        - validate
         # - deploy:
         #     context:
         #       -org-global
@@ -435,9 +435,9 @@ workflows:
         #                 job_type: deployment
         #                 environment: Staging
         #                 environment_type: staging
-        # - plan:
-        #     requires:
-        #       - validate
+        - plan:
+            requires:
+              - validate
         # - apply:
         #     requires:
         #       - plan
