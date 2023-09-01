@@ -81,7 +81,10 @@ declare -A projects_and_variables=(
 # Function to fetch and set variables
 function _fetch_and_set_variables() {
   project_name="$1"
+  echo "ENTROOOOOO"
+  echo "$project_name"
   variables=(${projects_and_variables["$project_name"]})
+  echo "$variables"
   
   for variable_name in "${variables[@]}"; do
     variable_value=$(aws ssm get-parameter --name "/leadgenius/terraform/${project_name}/${BRANCH}/${variable_name}" --with-decryption --query "Parameter" | jq -r '.Value')
@@ -121,6 +124,7 @@ function _terraform() {
         ## Check if the sanitized project is in the array
         if [[ -n "${projects_and_variables[$PROJECT_SANITIZED]}" ]]; then
           echo "ENTRO"
+          echo $PROJECT_SANITIZED
           echo "${projects_and_variables[$PROJECT_SANITIZED]}"
 
           _fetch_and_set_variables "$PROJECT_SANITIZED" "${projects_and_variables[$PROJECT_SANITIZED]}"
