@@ -58,6 +58,37 @@ function _get_branch() {
   esac
 }
 
+# Array of variables configured for each environment
+declare -A projects_and_variables=(
+  ["development"]="
+    vpc_cidr
+    certificate_alb_private_arn
+    private_subnets_cidr"
+  ["europe"]="
+    vpc_cidr
+    certificate_alb_private_arn
+    private_subnets_cidr"
+  ["experimental"]="
+    vpc_cidr
+    certificate_alb_private_arn
+    private_subnets_cidr"
+  ["root"]="
+    vpc_cidr
+    certificate_alb_private_arn
+    private_subnets_cidr"
+)
+
+# Function to fetch and set variables
+function _fetch_and_set_variables() {
+  project_name="$1"
+  variables=(${projects_and_variables["$project_name"]})
+  
+  for variable_name in "${variables[@]}"; do
+    variable_value=$(aws ssm get-parameter --name "/leadgenius/terraform/${project_name}/${BRANCH}/${variable_name}" --with-decryption --query "Parameter" | jq -r '.Value')
+    export "TF_VAR_${variable_name}"="$variable_value"
+  done
+}
+
 # This function is a wrapper around terraform binary to execute additional
 # steps before passing the params to the real terraform.
 function _terraform() {
@@ -83,38 +114,18 @@ function _terraform() {
         echo $ARGS
 
         # Obtaining variables from AWS Param Store.
+        
+        ## Sanitizing the project name removing the slash from the directory name 
         PROJECT_SANITIZED=$(echo "${project}" | sed 's/\/$//')
-        case "$PROJECT_SANITIZED" in
-          'development')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
-            ;;
-          'europe')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
-            ;;
-          'experimental')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
-            ;;
-          'logging')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
-            ;;
-          'root')
-            export TF_VAR_public_subnets_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/private_subnets_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_vpc_cidr=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/vpc_cidr" --with-decryption --query "Parameter" | jq -r '.Value')
-            export TF_VAR_certificate_alb_private_arn=$(aws ssm get-parameter --name "/leadgenius/terraform/${PROJECT_SANITIZED}/${BRANCH}/certificate_alb_private_arn" --with-decryption --query "Parameter" | jq -r '.Value')
-            ;;
-          *)
-            echo "Unknown project. Skip deployment"
-            exit 0
-            ;;
-        esac
+
+        ## Check if the sanitized project is in the array
+        if [[ -n "${projects_and_variables[$PROJECT_SANITIZED]}" ]]; then
+          _fetch_and_set_variables "$PROJECT_SANITIZED" "${projects_and_variables[$PROJECT_SANITIZED]}"
+        else
+          echo "Unknown project. Skip deployment"
+          exit 0
+        fi
+
         ${TERRABIN} ${ARGS}
         popd
     done
