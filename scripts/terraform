@@ -120,6 +120,9 @@ function _terraform() {
 
         ## Check if the sanitized project is in the array
         if [[ -n "${projects_and_variables[$PROJECT_SANITIZED]}" ]]; then
+          echo "ENTRO"
+          echo "${projects_and_variables[$PROJECT_SANITIZED]}"
+
           _fetch_and_set_variables "$PROJECT_SANITIZED" "${projects_and_variables[$PROJECT_SANITIZED]}"
         else
           echo "Unknown project. Skip deployment"
