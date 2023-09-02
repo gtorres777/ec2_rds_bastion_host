@@ -91,10 +91,15 @@ function _fetch_and_set_variables() {
 # This function is a wrapper around terraform binary to execute additional
 # steps before passing the params to the real terraform.
 function _terraform() {
+    echo "ENTRO1"
     [ ! -d environments ] && echo "No environments" && exit 1
     pushd environments
+
+    echo "ENTRO2"
     # where d is the project inside environments,
     for project in */ ; do
+
+        echo "ENTRO3"
         # Validations
         [ -L "${project%/}" ] && echo "${project%/} its a link" && continue
         [ -z "${project}" ] && echo "${project} empty" && continue
