@@ -100,15 +100,19 @@ function _terraform() {
     for project in */ ; do
 
         echo "ENTRO3"
+        echo "${project}"
         # Validations
         [ -L "${project%/}" ] && echo "${project%/} its a link" && continue
         [ -z "${project}" ] && echo "${project} empty" && continue
 
+        echo "ENTRO4"
         # Get real branch.
         BRANCH=$(_get_branch $project)
         if [ "$BRANCH" == "SKIP" ]; then 
           continue
         fi
+        
+        echo "ENTRO5"
         echo "> $LG_PR_TARGET target"
         echo "> $1 on ${project} branch ${BRANCH}"
         pushd ${project}
