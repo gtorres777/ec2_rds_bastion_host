@@ -40,7 +40,6 @@ trap 'error_handler $? "${BASH_SOURCE}" "$LINENO" "$BASH_COMMAND"' EXIT
 # Look at .circleci/config.yml for LG_PR_TARGET and his definition.
 function _get_branch() {
   project=$1
-  echo "ENTRO GET BRANCH"
   case $CIRCLE_BRANCH in
     "master" | "staging" | "production")
       if [ -d "${project}${CIRCLE_BRANCH}" ] &&
