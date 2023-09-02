@@ -42,6 +42,9 @@ function _get_branch() {
   project=$1
   case $CIRCLE_BRANCH in
     "master" | "staging" | "production")
+      echo "ENTRO AL CIRCLEBRANCH"
+      echo $project
+      echo $CIRCLEBRANCH
       if [ -d "${project}${CIRCLE_BRANCH}" ] &&
          [ -f "${project}${CIRCLE_BRANCH}/backend.conf" ]; then
         echo $CIRCLE_BRANCH
