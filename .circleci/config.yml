@@ -54,7 +54,7 @@ commands:
             name: Getting target branch
             command: |
               # Default branch to avoid issues.
-              target_branch="master"
+              target_branch="$CIRCLE_BRANCH"
               echo "export LG_PR_TARGET=$target_branch" >> "$BASH_ENV"
 
     notify_slack_error:

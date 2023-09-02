@@ -7,9 +7,9 @@ variable "vpc_cidr" {
   type = string
 }
 
-variable "public_subnets_cidr" {
-  type = list(string)
-}
+# variable "public_subnets_cidr" {
+#   type = list(string)
+# }
 
 variable "certificate_alb_private_arn" {
   type = any
