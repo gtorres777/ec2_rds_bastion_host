@@ -4,6 +4,7 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "private_subnets_cidr" {
-}
-
+# variable "GH_TOKEN" {
+#   type        = string
+#   description = "The gh token"
+# }
