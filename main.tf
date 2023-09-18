@@ -2,18 +2,18 @@ locals {
   availability_zones = ["${var.aws_region}a", "${var.aws_region}b"]
 }
 
-module "vpc_networking" {
-  source = "./modules/vpc_networking"
-  availability_zones = local.availability_zones
-  aws_region         = var.aws_region
+# module "vpc_networking" {
+#   source = "./modules/vpc_networking"
+#   availability_zones = local.availability_zones
+#   aws_region         = var.aws_region
 
-  vpc_cidr = "11.0.0.0/16"
+#   vpc_cidr = "11.0.0.0/16"
 
-  public_subnets_cidr      = ["11.0.1.0/24", "11.0.2.0/24"]
-  # public_subnets_cidr      = var.private_subnets_cidr
-  private_subnets_rds_cidr = ["11.0.3.0/24", "11.0.4.0/24"]
+#   public_subnets_cidr      = ["11.0.1.0/24", "11.0.2.0/24"]
+#   # public_subnets_cidr      = var.private_subnets_cidr
+#   private_subnets_rds_cidr = ["11.0.3.0/24", "11.0.4.0/24"]
 
-}
+# }
 
 # module "rds-dataddo-sg" {
 #   source      = "terraform-aws-modules/security-group/aws"
@@ -471,6 +471,26 @@ module "vpc_networking" {
 
 module "codebuild" {
   source = "./modules/codebuild"
+
+  name                        = "test-project"
+  description                 = "test_codebuild_project"
+  environment                 = "Test"
+  build_timeout               = "5"
+
+  artifacts_type              = "NO_ARTIFACTS"
+  compute_type                = "BUILD_GENERAL1_SMALL"
+  image                       = "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+  environment_type            = "LINUX_CONTAINER"
+  image_pull_credentials_type = "CODEBUILD"
+  logs_group_name             = "log-group"
+  logs_stream_name            = "log-stream"
+  source_type                 = "GITHUB"
+  source_location             = "https://github.com/gtorres777/my-react-app"
+  source_git_clone_depth      = 1
+
+  source_version              = "master"
+  
+
 }
 
 module "codepipeline" {
