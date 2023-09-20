@@ -106,12 +106,10 @@ resource "aws_iam_role_policy_attachment" "codepipeline_custom_policy" {
   policy_arn = aws_iam_policy.policy.arn
 }
 
-data "aws_codestarconnections_connection" "tux_connection" {
-  arn = "arn:aws:codestar-connections:us-east-1:111355452311:connection/623d5ea1-9523-4a02-b393-a9e655f1cc1a"
-}
 
-resource "aws_codepipeline" "example" {
-  name     = "my-codepipeline"
+resource "aws_codepipeline" "codepipeline" {
+  name     = var.name
+  # name     = "my-codepipeline"
   role_arn = aws_iam_role.codepipeline.arn
 
   artifact_store {
@@ -120,41 +118,39 @@ resource "aws_codepipeline" "example" {
     type     = "S3"
   }
 
-  stage {
-    name = "Source"
+  dynamic "stage" {
+    for_each = var.stages
 
-    action {
-      name            = "Source"
-      category        = "Source"
-      owner           = "AWS"
-      provider        = "CodeStarSourceConnection"
-      version         = "1"
-      output_artifacts = ["SourceArtifact"]
+    content {
+      name  = stage.value.name
 
-      configuration = {
-        ConnectionArn    = data.aws_codestarconnections_connection.tux_connection.arn
-        FullRepositoryId = "gtorres777/my-react-app"
-        BranchName       = "master"
+      dynamic "action"{
+        for_each = stage.value.action
+
+        content {
+          name              = action.value.name
+          category          = action.value.category
+          owner             = action.value.owner
+          provider          = action.value.provider
+          version           = action.value.version
+
+          input_artifacts   = action.value.input_artifacts
+          output_artifacts  = action.value.output_artifacts
+          role_arn          = action.value.role_arn
+          run_order         = action.value.run_order
+          region            = action.value.region
+          namespace         = action.value.namespace
+          configuration     = action.value.configuration
+        }
+
       }
+
     }
+
   }
 
-  stage {
-    name = "Build"
-
-    action {
-      name            = "BuildAction"
-      category        = "Build"
-      owner           = "AWS"
-      provider        = "CodeBuild"
-      version         = "1"
-      input_artifacts = ["SourceArtifact"]
-      output_artifacts = ["BuildArtifact"]
-
-      configuration = {
-        ProjectName = var.aws_codebuild_project_name
-      }
-    }
+  tags = {
+    Environment = var.environment
   }
 }
 

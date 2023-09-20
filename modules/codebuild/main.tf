@@ -62,7 +62,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_custom_policy" {
   policy_arn = aws_iam_policy.policy.arn
 }
 
-resource "aws_codebuild_project" "example" {
+resource "aws_codebuild_project" "codebuild" {
   name          = var.name
   # name          = "test-project"
   description   = var.description
@@ -92,7 +92,7 @@ resource "aws_codebuild_project" "example" {
     # image_pull_credentials_type = "CODEBUILD"
 
     dynamic "environment_variable" {
-      for_each = var.environment_variables
+      for_each = var.environment_variables != null ? var.environment_variables : []
 
       content {
         name  = environment_variable.value.name

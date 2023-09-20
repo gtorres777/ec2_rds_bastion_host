@@ -2,18 +2,18 @@ locals {
   availability_zones = ["${var.aws_region}a", "${var.aws_region}b"]
 }
 
-# module "vpc_networking" {
-#   source = "./modules/vpc_networking"
-#   availability_zones = local.availability_zones
-#   aws_region         = var.aws_region
+module "vpc_networking" {
+  source = "./modules/vpc_networking"
+  availability_zones = local.availability_zones
+  aws_region         = var.aws_region
 
-#   vpc_cidr = "11.0.0.0/16"
+  vpc_cidr = "11.0.0.0/16"
 
-#   public_subnets_cidr      = ["11.0.1.0/24", "11.0.2.0/24"]
-#   # public_subnets_cidr      = var.private_subnets_cidr
-#   private_subnets_rds_cidr = ["11.0.3.0/24", "11.0.4.0/24"]
+  public_subnets_cidr      = ["11.0.1.0/24", "11.0.2.0/24"]
+  # public_subnets_cidr      = var.private_subnets_cidr
+  private_subnets_rds_cidr = ["11.0.3.0/24", "11.0.4.0/24"]
 
-# }
+}
 
 # module "rds-dataddo-sg" {
 #   source      = "terraform-aws-modules/security-group/aws"
@@ -474,7 +474,7 @@ module "codebuild" {
 
   name                        = "test-project"
   description                 = "test_codebuild_project"
-  environment                 = "Test"
+  environment                 = "Testing"
   build_timeout               = "5"
 
   artifacts_type              = "NO_ARTIFACTS"
@@ -489,17 +489,76 @@ module "codebuild" {
   source_git_clone_depth      = 1
 
   source_version              = "master"
+
+  environment_variables = [
+    {
+      name  = "SOME_KEY1"
+      value = "SOME_VALUE1"
+    },
+    {
+      name  = "SOME_KEY2"
+      value = "SOME_VALUE2"
+    }
+  ] 
   
 
+}
+
+data "aws_codestarconnections_connection" "aws_codestar_connection" {
+  arn = "arn:aws:codestar-connections:us-east-1:111355452311:connection/623d5ea1-9523-4a02-b393-a9e655f1cc1a"
 }
 
 module "codepipeline" {
   source = "./modules/codepipeline"
 
-  s3_bucket = "tuxartifactstore"
-  aws_codebuild_project_name = module.codebuild.aws_codebuild_project_name
+  name        = "premiere-testing"
+  environment = "Testing"
+  s3_bucket   = "tuxartifactstore"
+
+  stages = [
+      {
+        name = "Source"
+
+        action = [
+          {
+            name              = "Source"
+            category          = "Source"
+            owner             = "AWS"
+            provider          = "CodeStarSourceConnection"
+            version           = "1"
+            output_artifacts  = ["SourceArtifact"]
+
+            configuration = {
+              ConnectionArn    = data.aws_codestarconnections_connection.aws_codestar_connection.arn
+              FullRepositoryId = "gtorres777/my-react-app"
+              BranchName       = "master"
+            }
+          }
+        ] 
+      },
+      {
+        name = "Build"
+
+        action = [
+          {
+            name            = "BuildAction"
+            category        = "Build"
+            owner           = "AWS"
+            provider        = "CodeBuild"
+            version         = "1"
+            input_artifacts = ["SourceArtifact"]
+            output_artifacts = ["BuildArtifact"]
+
+            configuration = {
+              ProjectName = module.codebuild.aws_codebuild_project.name
+            }
+          }
+        ] 
+      }
+  ]
 
   depends_on = [
     module.codebuild
   ]
+
 }
