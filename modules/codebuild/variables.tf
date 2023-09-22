@@ -25,6 +25,24 @@ variable "artifacts_type" {
   description = "Build output artifact's type. Valid values are CODEPIPELINE, NO_ARTIFACTS, S3"
 }
 
+variable "artifacts_location" {
+  type        = string
+  default     = null
+  description = "Information about the build output artifact location. If type is set to CODEPIPELINE or NO_ARTIFACTS, this value is ignored. If type is set to S3, this is the name of the output bucket."
+}
+
+variable "artifacts_packaging" {
+  type        = string
+  default     = null
+  description = "Type of build output artifact to create. If type is set to S3, valid values are NONE, ZIP"
+}
+
+variable "artifacts_path" {
+  type        = string
+  default     = null
+  description = "If type is set to S3, this is the path to the output artifact."
+}
+
 variable "compute_type" {
   type        = string
   description = "Information about the compute resources the build project will use"
@@ -87,3 +105,17 @@ variable "source_version" {
   description = "Version of the build input to be built for this project. If not specified, the latest version is used"
 }
 
+variable "vpc_id" {
+  type        = string
+  description = "ID of the VPC within which to run builds"
+}
+
+variable "subnets" {
+  type        = list(string)
+  description = "Subnet IDs within which to run builds"
+}
+
+variable "sg_ids" {
+  type        = list(string)
+  description = "Security group IDs to assign to running builds."
+}

@@ -469,96 +469,96 @@ module "vpc_networking" {
 #   egress_rules        = ["all-all"]
 # }
 
-module "codebuild" {
-  source = "./modules/codebuild"
+# module "codebuild" {
+#   source = "./modules/codebuild"
 
-  name                        = "test-project"
-  description                 = "test_codebuild_project"
-  environment                 = "Testing"
-  build_timeout               = "5"
+#   name                        = "test-project"
+#   description                 = "test_codebuild_project"
+#   environment                 = "Testing"
+#   build_timeout               = "5"
 
-  artifacts_type              = "NO_ARTIFACTS"
-  compute_type                = "BUILD_GENERAL1_SMALL"
-  image                       = "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
-  environment_type            = "LINUX_CONTAINER"
-  image_pull_credentials_type = "CODEBUILD"
-  logs_group_name             = "log-group"
-  logs_stream_name            = "log-stream"
-  source_type                 = "GITHUB"
-  source_location             = "https://github.com/gtorres777/my-react-app"
-  source_git_clone_depth      = 1
+#   artifacts_type              = "NO_ARTIFACTS"
+#   compute_type                = "BUILD_GENERAL1_SMALL"
+#   image                       = "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+#   environment_type            = "LINUX_CONTAINER"
+#   image_pull_credentials_type = "CODEBUILD"
+#   logs_group_name             = "log-group"
+#   logs_stream_name            = "log-stream"
+#   source_type                 = "GITHUB"
+#   source_location             = "https://github.com/gtorres777/djangoapp"
+#   source_git_clone_depth      = 1
 
-  source_version              = "master"
+#   source_version              = "master"
 
-  environment_variables = [
-    {
-      name  = "SOME_KEY1"
-      value = "SOME_VALUE1"
-    },
-    {
-      name  = "SOME_KEY2"
-      value = "SOME_VALUE2"
-    }
-  ] 
-  
+#   vpc_id = module.vpc_networking.vpc_id
+#   subnets = module.vpc_networking.private_subnets_ids
 
-}
+#   environment_variables = [
+#     {
+#       name  = "SOME_KEY1"
+#       value = "SOME_VALUE1"
+#     },
+#     {
+#       name  = "SOME_KEY2"
+#       value = "SOME_VALUE2"
+#     }
+#   ] 
+# }
 
-data "aws_codestarconnections_connection" "aws_codestar_connection" {
-  arn = "arn:aws:codestar-connections:us-east-1:111355452311:connection/623d5ea1-9523-4a02-b393-a9e655f1cc1a"
-}
+# data "aws_codestarconnections_connection" "aws_codestar_connection" {
+#   arn = "arn:aws:codestar-connections:us-east-1:111355452311:connection/623d5ea1-9523-4a02-b393-a9e655f1cc1a"
+# }
 
-module "codepipeline" {
-  source = "./modules/codepipeline"
+# module "codepipeline" {
+#   source = "./modules/codepipeline"
 
-  name        = "premiere-testing"
-  environment = "Testing"
-  s3_bucket   = "tuxartifactstore"
+#   name        = "premiere-testing"
+#   environment = "Testing"
+#   s3_bucket   = "tuxartifactstore"
 
-  stages = [
-      {
-        name = "Source"
+#   stages = [
+#       {
+#         name = "Source"
 
-        action = [
-          {
-            name              = "Source"
-            category          = "Source"
-            owner             = "AWS"
-            provider          = "CodeStarSourceConnection"
-            version           = "1"
-            output_artifacts  = ["SourceArtifact"]
+#         action = [
+#           {
+#             name              = "Source"
+#             category          = "Source"
+#             owner             = "AWS"
+#             provider          = "CodeStarSourceConnection"
+#             version           = "1"
+#             output_artifacts  = ["SourceArtifact"]
 
-            configuration = {
-              ConnectionArn    = data.aws_codestarconnections_connection.aws_codestar_connection.arn
-              FullRepositoryId = "gtorres777/my-react-app"
-              BranchName       = "master"
-            }
-          }
-        ] 
-      },
-      {
-        name = "Build"
+#             configuration = {
+#               ConnectionArn    = data.aws_codestarconnections_connection.aws_codestar_connection.arn
+#               FullRepositoryId = "gtorres777/djangoapp"
+#               BranchName       = "master"
+#             }
+#           }
+#         ] 
+#       },
+#       {
+#         name = "Build"
 
-        action = [
-          {
-            name            = "BuildAction"
-            category        = "Build"
-            owner           = "AWS"
-            provider        = "CodeBuild"
-            version         = "1"
-            input_artifacts = ["SourceArtifact"]
-            output_artifacts = ["BuildArtifact"]
+#         action = [
+#           {
+#             name            = "BuildAction"
+#             category        = "Build"
+#             owner           = "AWS"
+#             provider        = "CodeBuild"
+#             version         = "1"
+#             input_artifacts = ["SourceArtifact"]
+#             output_artifacts = ["BuildArtifact"]
 
-            configuration = {
-              ProjectName = module.codebuild.aws_codebuild_project.name
-            }
-          }
-        ] 
-      }
-  ]
+#             configuration = {
+#               ProjectName = module.codebuild.aws_codebuild_project.name
+#             }
+#           }
+#         ] 
+#       }
+#   ]
 
-  depends_on = [
-    module.codebuild
-  ]
-
-}
+#   depends_on = [
+#     module.codebuild
+#   ]
+# }

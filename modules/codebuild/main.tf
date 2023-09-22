@@ -74,6 +74,9 @@ resource "aws_codebuild_project" "codebuild" {
   artifacts {
     type = var.artifacts_type
     # type = "NO_ARTIFACTS"
+    location = var.artifacts_location
+    packaging = var.artifacts_packaging
+    path = var.artifacts_path
   }
 
   # cache {
@@ -100,16 +103,7 @@ resource "aws_codebuild_project" "codebuild" {
         type  = environment_variable.value.type
       }
     }
-    # environment_variable {
-    #   name  = "SOME_KEY1"
-    #   value = "SOME_VALUE1"
-    # }
 
-    # environment_variable {
-    #   name  = "SOME_KEY2"
-    #   value = "SOME_VALUE2"
-    #   type  = "PARAMETER_STORE"
-    # }
   }
 
   logs_config {
@@ -137,19 +131,21 @@ resource "aws_codebuild_project" "codebuild" {
   source_version = var.source_version
   # source_version = "master"
 
-  # vpc_config {
-  #   vpc_id = aws_vpc.example.id
+  vpc_config {
+    vpc_id = var.vpc_id
 
-  #   subnets = [
-  #     aws_subnet.example1.id,
-  #     aws_subnet.example2.id,
-  #   ]
+    subnets = var.subnets
+    # [
+    #   aws_subnet.example1.id,
+    #   aws_subnet.example2.id,
+    # ]
 
-  #   security_group_ids = [
-  #     aws_security_group.example1.id,
-  #     aws_security_group.example2.id,
-  #   ]
-  # }
+    security_group_ids = var.sg_ids 
+    # [
+    #   aws_security_group.example1.id,
+    #   aws_security_group.example2.id,
+    # ]
+  }
 
   tags = {
     Environment = var.environment
