@@ -23,6 +23,19 @@ resource "aws_iam_policy" "policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        Effect = "Allow", 
+        Action = [
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeDhcpOptions",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeVpcs"
+        ], 
+        Resource = "*" 
+      },
+      {
         Effect = "Allow",
         Action = [
           "logs:CreateLogGroup",

@@ -7,11 +7,11 @@ module "vpc_networking" {
   availability_zones = local.availability_zones
   aws_region         = var.aws_region
 
-  vpc_cidr = "11.0.0.0/16"
+  vpc_cidr = "10.0.0.0/16"
 
-  public_subnets_cidr      = ["11.0.1.0/24", "11.0.2.0/24"]
+  public_subnets_cidr      = ["10.0.1.0/24", "10.0.2.0/24"]
   # public_subnets_cidr      = var.private_subnets_cidr
-  private_subnets_rds_cidr = ["11.0.3.0/24", "11.0.4.0/24"]
+  private_subnets_rds_cidr = ["10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
 
 }
 
@@ -94,37 +94,37 @@ module "vpc_networking" {
 #   egress_rules        = ["all-all"]
 # }
 
-# module "ec2_ubuntu" {
-#   source = "./modules/ec2_ubuntu"
+module "ec2_ubuntu" {
+  source = "./modules/ec2_ubuntu"
 
-#   vpc_id        = module.vpc_networking.vpc_id
-#   path_to_key   = "keys/mykey.pub"
-#   ec2_name      = "ec2 bastion host"
-#   instance_type = "t3.micro"
-#   subnet_id     = module.vpc_networking.public_subnets_ids[1]
+  vpc_id        = module.vpc_networking.vpc_id
+  path_to_key   = "keys/mykey.pub"
+  ec2_name      = "ec2 bastion host"
+  instance_type = "t3.micro"
+  subnet_id     = module.vpc_networking.public_subnets_ids[1]
 
-#   ingress_with_source_security_group_id = [
-#     {
-#       description              = "datadoo"
-#       rule                     = "postgresql-tcp"
-#       source_security_group_id = module.rds-dataddo-sg.security_group_id
-#     },
-#     {
-#       description              = "retool"
-#       rule                     = "postgresql-tcp"
-#       source_security_group_id = module.rds-retool-sg.security_group_id
-#     },
-#     {
-#       description              = "Access for DBT"
-#       rule                     = "postgresql-tcp"
-#       source_security_group_id = module.rds-dbt-sg.security_group_id
-#     },
-#     {
-#       description              = "Allow from internal VPC"
-#       rule                     = "postgresql-tcp"
-#       source_security_group_id = module.rds-vpc-sg.security_group_id
-#     } ]
-# }
+  # ingress_with_source_security_group_id = [
+  #   {
+  #     description              = "datadoo"
+  #     rule                     = "postgresql-tcp"
+  #     source_security_group_id = module.rds-dataddo-sg.security_group_id
+  #   },
+  #   {
+  #     description              = "retool"
+  #     rule                     = "postgresql-tcp"
+  #     source_security_group_id = module.rds-retool-sg.security_group_id
+  #   },
+  #   {
+  #     description              = "Access for DBT"
+  #     rule                     = "postgresql-tcp"
+  #     source_security_group_id = module.rds-dbt-sg.security_group_id
+  #   },
+  #   {
+  #     description              = "Allow from internal VPC"
+  #     rule                     = "postgresql-tcp"
+  #     source_security_group_id = module.rds-vpc-sg.security_group_id
+  #   } ]
+}
 
 # module "rds-prod" {
 #   source = "./modules/rds"
@@ -147,6 +147,17 @@ module "vpc_networking" {
 #   public_subnet_cidr = module.vpc_networking.public_subnets_cidr[0]
 #   rds_sg_name = "rds_sg_2"
 # }
+
+module "rds-testing" {
+  source = "./modules/rds"
+
+  identifier = "rds-testing"
+  vpc_id               = module.vpc_networking.vpc_id
+  db_subnet_group_name = module.vpc_networking.aws_rds_subnet_group_id
+  db_name              = "rds_testing"
+  public_subnet_cidr = module.vpc_networking.public_subnets_cidr[0]
+  rds_sg_name = "rds_sg_2"
+}
 
 # module "alarm" {
 #   source = "./modules/alarms"
@@ -346,15 +357,15 @@ module "vpc_networking" {
 
 # }
 
-# module "alb" {
-#   source = "./modules/alb"
+module "alb" {
+  source = "./modules/alb"
 
-#   vpc_id        = module.vpc_networking.vpc_id
-#   environment   = "Production"
-#   internal      = "false"
-#   subnets_ids     = module.vpc_networking.public_subnets_ids
+  vpc_id        = module.vpc_networking.vpc_id
+  environment   = "Testing"
+  internal      = "false"
+  subnets_ids     = module.vpc_networking.public_subnets_ids
 
-# }
+}
 
 # module "nextcloud-ecs" {
 #     source = "./modules/ecs"
@@ -376,6 +387,35 @@ module "vpc_networking" {
 #     module.alb
 #   ]
 # }
+
+module "premiere-ecs" {
+    source = "./modules/ecs"
+    create = true
+
+    # Network/Account Settings
+    vpc_id = module.vpc_networking.vpc_id
+    service_name = "premiere-testing"
+    cluster_name = "testing"
+    private_subnets = [module.vpc_networking.private_subnets_ids[2]] # Where be located the tasks.
+    alb = module.alb # LoadBalancer
+    image = "python:3.9.12-slim"
+
+    target_group_arn = module.alb.nextcloud-tg-arn
+
+    # Task Degfinition (Per Componente)
+    task_web_port = 80 ## This must match with the por specified in 0.0.0.0:8000
+    desired_tasks = 1
+    alb_sg_id = module.alb.alb-sg.id
+
+    environment_variables = [ {
+      "name": "DATABASE_URL",
+      "value": "postgres://postgres:mysecret@premiere-testing.c2x.us-east-1.rds.amazonaws.com:5432/rds_testing"
+    } ]
+   
+  depends_on = [
+    module.alb
+  ]
+}
 
 # module "snstux" {
 #   source = "./modules/sns"
@@ -469,96 +509,114 @@ module "vpc_networking" {
 #   egress_rules        = ["all-all"]
 # }
 
-# module "codebuild" {
-#   source = "./modules/codebuild"
+module "rds-vpc-sg" {
+  source      = "terraform-aws-modules/security-group/aws"
+  version     = "4.17.1"
+  name        = "rds-vpc-sg"
+  description = "Allow from internal VPC"
+  vpc_id      = module.vpc_networking.vpc_id
 
-#   name                        = "test-project"
-#   description                 = "test_codebuild_project"
-#   environment                 = "Testing"
-#   build_timeout               = "5"
+  ingress_cidr_blocks = [
+    "10.0.0.0/16"
+  ]
 
-#   artifacts_type              = "NO_ARTIFACTS"
-#   compute_type                = "BUILD_GENERAL1_SMALL"
-#   image                       = "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
-#   environment_type            = "LINUX_CONTAINER"
-#   image_pull_credentials_type = "CODEBUILD"
-#   logs_group_name             = "log-group"
-#   logs_stream_name            = "log-stream"
-#   source_type                 = "GITHUB"
-#   source_location             = "https://github.com/gtorres777/djangoapp"
-#   source_git_clone_depth      = 1
+  ingress_rules       = ["postgresql-tcp"]
 
-#   source_version              = "master"
+  egress_cidr_blocks  = ["0.0.0.0/0"]
+  egress_rules        = ["all-all"]
+}
 
-#   vpc_id = module.vpc_networking.vpc_id
-#   subnets = module.vpc_networking.private_subnets_ids
+module "codebuild" {
+  source = "./modules/codebuild"
 
-#   environment_variables = [
-#     {
-#       name  = "SOME_KEY1"
-#       value = "SOME_VALUE1"
-#     },
-#     {
-#       name  = "SOME_KEY2"
-#       value = "SOME_VALUE2"
-#     }
-#   ] 
-# }
+  name                        = "test-project"
+  description                 = "test_codebuild_project"
+  environment                 = "Testing"
+  build_timeout               = "5"
 
-# data "aws_codestarconnections_connection" "aws_codestar_connection" {
-#   arn = "arn:aws:codestar-connections:us-east-1:111355452311:connection/623d5ea1-9523-4a02-b393-a9e655f1cc1a"
-# }
+  artifacts_type              = "NO_ARTIFACTS"
+  compute_type                = "BUILD_GENERAL1_SMALL"
+  image                       = "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+  environment_type            = "LINUX_CONTAINER"
+  image_pull_credentials_type = "CODEBUILD"
+  logs_group_name             = "log-group"
+  logs_stream_name            = "log-stream"
+  source_type                 = "GITHUB"
+  source_location             = "https://github.com/gtorres777/djangoapp"
+  source_git_clone_depth      = 1
 
-# module "codepipeline" {
-#   source = "./modules/codepipeline"
+  source_version              = "master"
 
-#   name        = "premiere-testing"
-#   environment = "Testing"
-#   s3_bucket   = "tuxartifactstore"
+  vpc_id = module.vpc_networking.vpc_id
+  subnets = module.vpc_networking.private_subnets_ids
+  sg_ids = [module.premiere-ecs.ecs_service_sg_ids]
 
-#   stages = [
-#       {
-#         name = "Source"
+  environment_variables = [
+    {
+      name  = "SOME_KEY1"
+      value = "SOME_VALUE1"
+    },
+    {
+      name  = "SOME_KEY2"
+      value = "SOME_VALUE2"
+    }
+  ] 
+}
 
-#         action = [
-#           {
-#             name              = "Source"
-#             category          = "Source"
-#             owner             = "AWS"
-#             provider          = "CodeStarSourceConnection"
-#             version           = "1"
-#             output_artifacts  = ["SourceArtifact"]
+data "aws_codestarconnections_connection" "aws_codestar_connection" {
+  arn = "arn:aws:codestar-connections:us-east-1:111355452311:connection/623d5ea1-9523-4a02-b393-a9e655f1cc1a"
+}
 
-#             configuration = {
-#               ConnectionArn    = data.aws_codestarconnections_connection.aws_codestar_connection.arn
-#               FullRepositoryId = "gtorres777/djangoapp"
-#               BranchName       = "master"
-#             }
-#           }
-#         ] 
-#       },
-#       {
-#         name = "Build"
+module "codepipeline" {
+  source = "./modules/codepipeline"
 
-#         action = [
-#           {
-#             name            = "BuildAction"
-#             category        = "Build"
-#             owner           = "AWS"
-#             provider        = "CodeBuild"
-#             version         = "1"
-#             input_artifacts = ["SourceArtifact"]
-#             output_artifacts = ["BuildArtifact"]
+  name        = "premiere-testing"
+  environment = "Testing"
+  s3_bucket   = "tuxartifactstore"
 
-#             configuration = {
-#               ProjectName = module.codebuild.aws_codebuild_project.name
-#             }
-#           }
-#         ] 
-#       }
-#   ]
+  stages = [
+      {
+        name = "Source"
 
-#   depends_on = [
-#     module.codebuild
-#   ]
-# }
+        action = [
+          {
+            name              = "Source"
+            category          = "Source"
+            owner             = "AWS"
+            provider          = "CodeStarSourceConnection"
+            version           = "1"
+            output_artifacts  = ["SourceArtifact"]
+
+            configuration = {
+              ConnectionArn    = data.aws_codestarconnections_connection.aws_codestar_connection.arn
+              FullRepositoryId = "gtorres777/djangoapp"
+              BranchName       = "master"
+            }
+          }
+        ] 
+      },
+      {
+        name = "Build"
+
+        action = [
+          {
+            name            = "BuildAction"
+            category        = "Build"
+            owner           = "AWS"
+            provider        = "CodeBuild"
+            version         = "1"
+            input_artifacts = ["SourceArtifact"]
+            output_artifacts = ["BuildArtifact"]
+
+            configuration = {
+              ProjectName = module.codebuild.aws_codebuild_project.name
+            }
+          }
+        ] 
+      }
+  ]
+
+  depends_on = [
+    module.codebuild
+  ]
+}
