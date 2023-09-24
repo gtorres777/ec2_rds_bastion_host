@@ -449,5 +449,5 @@ workflows:
         #     requires:
         #       - plan
         - destroy:
-            requires:
-              - apply
+            # requires:
+            #   - apply
