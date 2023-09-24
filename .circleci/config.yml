@@ -445,9 +445,9 @@ workflows:
         - plan:
             requires:
               - validate
-        - apply:
-            requires:
-              - plan
+        # - apply:
+        #     requires:
+        #       - plan
         - destroy:
             requires:
               - apply
