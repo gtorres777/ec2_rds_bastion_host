@@ -448,6 +448,6 @@ workflows:
         # - apply:
         #     requires:
         #       - plan
-        - destroy:
+        - destroy
             # requires:
             #   - apply
