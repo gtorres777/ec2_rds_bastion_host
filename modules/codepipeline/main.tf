@@ -24,7 +24,8 @@ resource "aws_iam_policy" "policy" {
     Statement = [
       {
         Action = [
-            "codebuild:StartBuild"
+            "codebuild:StartBuild",
+            "codebuild:BatchGetBuilds"
         ]
         Effect   = "Allow"
         Resource = "*"

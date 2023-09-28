@@ -442,12 +442,12 @@ workflows:
         #                 job_type: deployment
         #                 environment: Staging
         #                 environment_type: staging
-        - plan:
-            requires:
-              - validate
-        # - apply:
+        # - plan:
         #     requires:
-        #       - plan
-        - destroy:
-            requires:
-              - plan
+        #       - validate
+        # # - apply:
+        # #     requires:
+        # #       - plan
+        # - destroy:
+        #     requires:
+        #       - apply

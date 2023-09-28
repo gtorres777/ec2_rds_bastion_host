@@ -30,7 +30,7 @@ resource "aws_instance" "host" {
   # the VPC subnet
   subnet_id = var.subnet_id
   # the security group
-  vpc_security_group_ids = ["${module.ec2-sg-server.security_group_id}"]
+  vpc_security_group_ids = ["${module.ec2-sg-server.security_group_id}",aws_security_group.allow-ssh.id]
 
   # the public SSH key
   key_name = aws_key_pair.mykeypair.key_name

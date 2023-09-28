@@ -398,7 +398,7 @@ module "premiere-ecs" {
     cluster_name = "testing"
     private_subnets = [module.vpc_networking.private_subnets_ids[2]] # Where be located the tasks.
     alb = module.alb # LoadBalancer
-    image = "python:3.9.12-slim"
+    image = "111355452311.dkr.ecr.us-east-1.amazonaws.com/mysite:testing-1"
 
     target_group_arn = module.alb.nextcloud-tg-arn
 
@@ -409,7 +409,7 @@ module "premiere-ecs" {
 
     environment_variables = [ {
       "name": "DATABASE_URL",
-      "value": "postgres://postgres:mysecret@premiere-testing.c2x.us-east-1.rds.amazonaws.com:5432/rds_testing"
+      "value": "postgres://postgres:mysecret@rds-testing.cz0vpnsvjuwe.us-east-1.rds.amazonaws.com:5432/rds_testing"
     } ]
    
   depends_on = [

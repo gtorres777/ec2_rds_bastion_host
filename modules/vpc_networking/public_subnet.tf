@@ -52,11 +52,11 @@ resource "aws_route_table_association" "public_subnets_rta" {
   route_table_id = aws_route_table.public_rt.id
 }
 
-resource "aws_eip" "nat_eips" {
-  count      = 1
-  vpc        = true
-  depends_on = [aws_internet_gateway.main_igw]
-}
+# resource "aws_eip" "nat_eips" {
+#   count      = 1
+#   vpc        = true
+#   depends_on = [aws_internet_gateway.main_igw]
+# }
 
 # resource "aws_nat_gateway" "nat_gws" {
 #   count         = 1

@@ -62,7 +62,8 @@ resource "aws_iam_policy" "policy" {
           "codebuild:CreateReport",
           "codebuild:UpdateReport",
           "codebuild:BatchPutTestCases",
-          "codebuild:BatchPutCodeCoverages"
+          "codebuild:BatchPutCodeCoverages",
+          "codebuild:BatchGetBuilds"
         ],
         Resource = "*"
       }
