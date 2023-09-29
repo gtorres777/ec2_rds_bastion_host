@@ -100,7 +100,7 @@ module "ec2_ubuntu" {
   vpc_id        = module.vpc_networking.vpc_id
   path_to_key   = "keys/mykey.pub"
   ec2_name      = "ec2 bastion host"
-  instance_type = "t3.micro"
+  instance_type = "t2.micro"
   subnet_id     = module.vpc_networking.public_subnets_ids[1]
 
   # ingress_with_source_security_group_id = [
@@ -398,12 +398,12 @@ module "premiere-ecs" {
     cluster_name = "testing"
     private_subnets = [module.vpc_networking.private_subnets_ids[2]] # Where be located the tasks.
     alb = module.alb # LoadBalancer
-    image = "111355452311.dkr.ecr.us-east-1.amazonaws.com/mysite:testing-1"
+    image = "111355452311.dkr.ecr.us-east-1.amazonaws.com/mysite:testing"
 
     target_group_arn = module.alb.nextcloud-tg-arn
 
     # Task Degfinition (Per Componente)
-    task_web_port = 80 ## This must match with the por specified in 0.0.0.0:8000
+    task_web_port = 8000 ## This must match with the por specified in 0.0.0.0:8000
     desired_tasks = 1
     alb_sg_id = module.alb.alb-sg.id
 
@@ -411,6 +411,13 @@ module "premiere-ecs" {
       "name": "DATABASE_URL",
       "value": "postgres://postgres:mysecret@rds-testing.cz0vpnsvjuwe.us-east-1.rds.amazonaws.com:5432/rds_testing"
     } ]
+
+    entry_point = [
+        "gunicorn",
+        "--bind",
+        "0.0.0.0:8000",
+        "mysite.wsgi:application"
+    ]
    
   depends_on = [
     module.alb

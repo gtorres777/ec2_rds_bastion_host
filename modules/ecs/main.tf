@@ -87,7 +87,7 @@ resource "aws_security_group" "allow-custom-alb" {
     to_port     = 65535
     protocol    = "tcp"
     description = "VPC"
-    cidr_blocks = ["11.0.0.0/16"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -173,7 +173,8 @@ resource "aws_iam_policy" "policy" {
         Action = [
           "ecr:BatchGetImage",
           "ecr:GetDownloadUrlForLayer",
-          "ecr:GetAuthorizationToken"
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability"
         ],
         Resource = "*"
       },
@@ -219,12 +220,14 @@ resource "aws_ecs_task_definition" "project" {
   cpu                      = 512
   memory                   = 1024
 
+
   container_definitions    = <<TASK_DEFINITION
   [
     {
       "name": "ecs-${var.service_name}-container",
       "image": "${var.image}",
       "essential": true,
+      "entryPoint": ${jsonencode(var.entry_point)},
       "environment": ${jsonencode(var.environment_variables)},
       "portMappings": [
         {

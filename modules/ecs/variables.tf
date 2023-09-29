@@ -57,3 +57,7 @@ variable "environment_variables" {
   type = list(map(string))
   default = null
 }
+
+variable "entry_point" {
+  type = list(string)
+}

@@ -52,23 +52,23 @@ resource "aws_route_table_association" "public_subnets_rta" {
   route_table_id = aws_route_table.public_rt.id
 }
 
-# resource "aws_eip" "nat_eips" {
-#   count      = 1
-#   vpc        = true
-#   depends_on = [aws_internet_gateway.main_igw]
-# }
+resource "aws_eip" "nat_eips" {
+  count      = 1
+  vpc        = true
+  depends_on = [aws_internet_gateway.main_igw]
+}
 
-# resource "aws_nat_gateway" "nat_gws" {
-#   count         = 1
-#   allocation_id = aws_eip.nat_eips.*.id[count.index]
-#   subnet_id     = aws_subnet.public_subnets.*.id[count.index]
+resource "aws_nat_gateway" "nat_gws" {
+  count         = 1
+  allocation_id = aws_eip.nat_eips.*.id[count.index]
+  subnet_id     = aws_subnet.public_subnets.*.id[count.index]
 
-#   tags = {
-#     Name        = "nat-${count.index}"
-#   }
+  tags = {
+    Name        = "nat-${count.index}"
+  }
 
-#   depends_on = [aws_internet_gateway.main_igw]
-# }
+  depends_on = [aws_internet_gateway.main_igw]
+}
 
 
 # resource "aws_security_group" "dms_sg" {
