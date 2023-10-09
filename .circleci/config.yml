@@ -222,6 +222,10 @@ jobs:
         - checkout
         - set_pull_request_branch
 
+        - add_ssh_keys:
+            fingerprints:
+              - "18:b5:50:7d:e2:3c:0a:ae:73:b9:1a:90:2c:bd:44:63"
+
         - run:
             name: Clone devops-scripts repo
             command: |
