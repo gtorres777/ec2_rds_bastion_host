@@ -37,6 +37,13 @@ resource "aws_iam_policy" "policy" {
         Resource = "*" 
       },
       {
+        Action = [
+          "codestar-connections:UseConnection"
+        ],
+        Resource = "*",
+        Effect = "Allow"
+      },
+      {
         Effect = "Allow",
         Action = [
           "logs:CreateLogGroup",

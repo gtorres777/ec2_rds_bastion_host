@@ -94,14 +94,14 @@ module "vpc_networking" {
 #   egress_rules        = ["all-all"]
 # }
 
-module "ec2_ubuntu" {
-  source = "./modules/ec2_ubuntu"
+# module "ec2_ubuntu" {
+#   source = "./modules/ec2_ubuntu"
 
-  vpc_id        = module.vpc_networking.vpc_id
-  path_to_key   = "keys/mykey.pub"
-  ec2_name      = "ec2 bastion host"
-  instance_type = "t2.micro"
-  subnet_id     = module.vpc_networking.public_subnets_ids[1]
+#   vpc_id        = module.vpc_networking.vpc_id
+#   path_to_key   = "keys/mykey.pub"
+#   ec2_name      = "ec2 bastion host"
+#   instance_type = "t2.micro"
+#   subnet_id     = module.vpc_networking.public_subnets_ids[1]
 
   # ingress_with_source_security_group_id = [
   #   {
@@ -124,7 +124,7 @@ module "ec2_ubuntu" {
   #     rule                     = "postgresql-tcp"
   #     source_security_group_id = module.rds-vpc-sg.security_group_id
   #   } ]
-}
+# }
 
 # module "rds-prod" {
 #   source = "./modules/rds"
@@ -148,16 +148,16 @@ module "ec2_ubuntu" {
 #   rds_sg_name = "rds_sg_2"
 # }
 
-module "rds-testing" {
-  source = "./modules/rds"
+# module "rds-testing" {
+#   source = "./modules/rds"
 
-  identifier = "rds-testing"
-  vpc_id               = module.vpc_networking.vpc_id
-  db_subnet_group_name = module.vpc_networking.aws_rds_subnet_group_id
-  db_name              = "rds_testing"
-  public_subnet_cidr = module.vpc_networking.public_subnets_cidr[0]
-  rds_sg_name = "rds_sg_2"
-}
+#   identifier = "rds-testing"
+#   vpc_id               = module.vpc_networking.vpc_id
+#   db_subnet_group_name = module.vpc_networking.aws_rds_subnet_group_id
+#   db_name              = "rds_testing"
+#   public_subnet_cidr = module.vpc_networking.public_subnets_cidr[0]
+#   rds_sg_name = "rds_sg_2"
+# }
 
 # module "alarm" {
 #   source = "./modules/alarms"
@@ -357,15 +357,15 @@ module "rds-testing" {
 
 # }
 
-module "alb" {
-  source = "./modules/alb"
+# module "alb" {
+#   source = "./modules/alb"
 
-  vpc_id        = module.vpc_networking.vpc_id
-  environment   = "Testing"
-  internal      = "false"
-  subnets_ids     = module.vpc_networking.public_subnets_ids
+#   vpc_id        = module.vpc_networking.vpc_id
+#   environment   = "Testing"
+#   internal      = "false"
+#   subnets_ids     = module.vpc_networking.public_subnets_ids
 
-}
+# }
 
 # module "nextcloud-ecs" {
 #     source = "./modules/ecs"
@@ -388,41 +388,41 @@ module "alb" {
 #   ]
 # }
 
-module "premiere-ecs" {
-    source = "./modules/ecs"
-    create = true
+# module "premiere-ecs" {
+#     source = "./modules/ecs"
+#     create = true
 
-    # Network/Account Settings
-    vpc_id = module.vpc_networking.vpc_id
-    service_name = "premiere-testing"
-    cluster_name = "testing"
-    private_subnets = [module.vpc_networking.private_subnets_ids[2]] # Where be located the tasks.
-    alb = module.alb # LoadBalancer
-    image = "111355452311.dkr.ecr.us-east-1.amazonaws.com/mysite:testing"
+#     # Network/Account Settings
+#     vpc_id = module.vpc_networking.vpc_id
+#     service_name = "premiere-testing"
+#     cluster_name = "testing"
+#     private_subnets = [module.vpc_networking.private_subnets_ids[2]] # Where be located the tasks.
+#     alb = module.alb # LoadBalancer
+#     image = "111355452311.dkr.ecr.us-east-1.amazonaws.com/mysite:testing"
 
-    target_group_arn = module.alb.nextcloud-tg-arn
+#     target_group_arn = module.alb.nextcloud-tg-arn
 
-    # Task Degfinition (Per Componente)
-    task_web_port = 8000 ## This must match with the por specified in 0.0.0.0:8000
-    desired_tasks = 1
-    alb_sg_id = module.alb.alb-sg.id
+#     # Task Degfinition (Per Componente)
+#     task_web_port = 8000 ## This must match with the por specified in 0.0.0.0:8000
+#     desired_tasks = 1
+#     alb_sg_id = module.alb.alb-sg.id
 
-    environment_variables = [ {
-      "name": "DATABASE_URL",
-      "value": "postgres://postgres:mysecret@rds-testing.cz0vpnsvjuwe.us-east-1.rds.amazonaws.com:5432/rds_testing"
-    } ]
+#     environment_variables = [ {
+#       "name": "DATABASE_URL",
+#       "value": "postgres://postgres:mysecret@rds-testing.cz0vpnsvjuwe.us-east-1.rds.amazonaws.com:5432/rds_testing"
+#     } ]
 
-    entry_point = [
-        "gunicorn",
-        "--bind",
-        "0.0.0.0:8000",
-        "mysite.wsgi:application"
-    ]
-   
-  depends_on = [
-    module.alb
-  ]
-}
+#     entry_point = [
+#         "gunicorn",
+#         "--bind",
+#         "0.0.0.0:8000",
+#         "mysite.wsgi:application"
+#     ]
+#    
+#   depends_on = [
+#     module.alb
+#   ]
+# }
 
 # module "snstux" {
 #   source = "./modules/sns"
@@ -556,7 +556,8 @@ module "codebuild" {
 
   vpc_id = module.vpc_networking.vpc_id
   subnets = module.vpc_networking.private_subnets_ids
-  sg_ids = [module.premiere-ecs.ecs_service_sg_ids]
+  sg_ids = [module.rds-vpc-sg.security_group_id]
+  # sg_ids = [module.premiere-ecs.ecs_service_sg_ids]
 
   environment_variables = [
     {
@@ -598,6 +599,7 @@ module "codepipeline" {
               ConnectionArn    = data.aws_codestarconnections_connection.aws_codestar_connection.arn
               FullRepositoryId = "gtorres777/djangoapp"
               BranchName       = "master"
+              OutputArtifactFormat = "CODEBUILD_CLONE_REF"
             }
           }
         ] 

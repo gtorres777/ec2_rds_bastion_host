@@ -223,6 +223,11 @@ jobs:
         - set_pull_request_branch
 
         - run:
+            name: Clone devops-scripts repo
+            command: |
+              git clone git@github.com:MobileWorks/devops-scripts.git
+
+        - run:
             name: Install AWS cli
             command: |
                 sudo apt-get update
