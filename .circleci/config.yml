@@ -229,7 +229,7 @@ jobs:
         - run:
             name: Clone devops-scripts repo
             command: |
-              git clone git@github.com:MobileWorks/devops-scripts.git
+              git clone git@github.com:AQPTech/backtesting-fe.git
 
         - run:
             name: Install AWS cli
