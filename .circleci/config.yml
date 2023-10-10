@@ -224,7 +224,7 @@ jobs:
 
         - add_ssh_keys:
             fingerprints:
-              - "b3:47:d0:05:d6:83:b2:5c:98:b8:93:a6:4b:ff:8c:05"
+              - "92:ef:5f:a1:05:92:00:01:9e:35:76:44:30:34:27:64"
 
         - run:
             name: Clone devops-scripts repo
