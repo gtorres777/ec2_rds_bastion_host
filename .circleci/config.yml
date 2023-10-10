@@ -227,6 +227,11 @@ jobs:
               - "b3:47:d0:05:d6:83:b2:5c:98:b8:93:a6:4b:ff:8c:05"
 
         - run:
+            name: Download scripts
+            command: |
+              wget -c https://raw.githubusercontent.com/MobileWorks/public-devops-scripts/master/notify_deploys.sh
+
+        - run:
             name: Clone devops-scripts repo
             command: |
               git clone git@github.com:AQPTech/backtesting-fe.git
