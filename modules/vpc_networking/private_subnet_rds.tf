@@ -13,7 +13,7 @@ resource "aws_subnet" "private_subnets_rds" {
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name        = "rds_subnet_group"
-  subnet_ids  = aws_subnet.private_subnets_rds.*.id
+  subnet_ids  = [aws_subnet.private_subnets_rds.*.id[0],aws_subnet.private_subnets_rds.*.id[1]]
 
   depends_on = [
     aws_subnet.private_subnets_rds
@@ -41,3 +41,8 @@ resource "aws_route_table_association" "private_rds_rta" {
   subnet_id      = aws_subnet.private_subnets_rds.*.id[count.index]
   route_table_id = aws_route_table.private_rds_rt.*.id[0]
 }
+# resource "aws_route_table_association" "private_rds_rta" {
+#   count          = length(var.private_subnets_rds_cidr)
+#   subnet_id      = aws_subnet.private_subnets_rds.*.id[count.index]
+#   route_table_id = aws_route_table.private_rds_rt.id
+# }

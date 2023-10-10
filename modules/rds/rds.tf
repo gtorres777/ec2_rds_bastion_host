@@ -14,6 +14,9 @@ resource "aws_db_instance" "rds_instance" {
   skip_final_snapshot    = var.skip_final_snapshot
   vpc_security_group_ids = ["${aws_security_group.rds_sg.id}"]
 
+  # performance_insights_enabled          = true
+  # monitoring_interval                   = 60
+
 }
 
 resource "aws_security_group" "rds_sg" {

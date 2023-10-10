@@ -71,13 +71,13 @@ resource "aws_lb_listener_rule" "nextcloud" {
 ##
 resource "aws_lb_target_group" "nextcloud" {
   name     = "nextcloud"
-  port     = 80
+  port     = 8000
   target_type = "ip"
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
-    matcher             = "200"
-    path                = "/"
+    matcher             = "302"
+    path                = "/admin/"
   }
 }
 ##
@@ -109,7 +109,15 @@ resource "aws_security_group" "default" {
     from_port        = 80
     to_port          = 80
     protocol         = "tcp"
-    cidr_blocks      = ["11.0.0.0/16"]
+    cidr_blocks      = ["10.0.0.0/16"]
+  }
+
+  egress {
+    description      = "Premiere"
+    from_port        = 8000
+    to_port          = 8000
+    protocol         = "tcp"
+    cidr_blocks      = ["10.0.0.0/16"]
   }
 
   egress {
@@ -117,7 +125,7 @@ resource "aws_security_group" "default" {
     from_port        = 443
     to_port          = 443
     protocol         = "tcp"
-    cidr_blocks      = ["11.0.0.0/16"]
+    cidr_blocks      = ["10.0.0.0/16"]
   }
 
   tags = {

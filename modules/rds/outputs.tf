@@ -9,3 +9,7 @@ output "db_cluster_identifier" {
 output "master_username" {
   value = aws_db_instance.rds_instance.username
 }
+
+output "rds" {
+  value = aws_db_instance.rds_instance
+}

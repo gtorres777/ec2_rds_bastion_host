@@ -77,10 +77,7 @@ declare -A projects_and_variables=(
 # Function to fetch and set variables
 function _fetch_and_set_variables() {
   project_name="$1"
-  echo "ENTROOOOOO"
-  echo "$project_name"
   variables=(${projects_and_variables["$project_name"]})
-  echo "$variables"
   
   for variable_name in "${variables[@]}"; do
     variable_value=$(aws ssm get-parameter --name "/leadgenius/terraform/${project_name}/${BRANCH}/${variable_name}" --with-decryption --query "Parameter" | jq -r '.Value')
@@ -91,28 +88,23 @@ function _fetch_and_set_variables() {
 # This function is a wrapper around terraform binary to execute additional
 # steps before passing the params to the real terraform.
 function _terraform() {
-    echo "ENTRO1"
     [ ! -d environments ] && echo "No environments" && exit 1
     pushd environments
 
-    echo "ENTRO2"
     # where d is the project inside environments,
     for project in */ ; do
 
-        echo "ENTRO3"
-        echo "${project}"
         # Validations
         [ -L "${project%/}" ] && echo "${project%/} its a link" && continue
         [ -z "${project}" ] && echo "${project} empty" && continue
 
-        echo "ENTRO4"
         # Get real branch.
         BRANCH=$(_get_branch $project)
+
         if [ "$BRANCH" == "SKIP" ]; then 
           continue
         fi
         
-        echo "ENTRO5"
         echo "> $LG_PR_TARGET target"
         echo "> $1 on ${project} branch ${BRANCH}"
         pushd ${project}
@@ -128,10 +120,6 @@ function _terraform() {
 
         ## Check if the sanitized project is in the array
         if [[ -n "${projects_and_variables[$PROJECT_SANITIZED]}" ]]; then
-          echo "ENTRO"
-          echo $PROJECT_SANITIZED
-          echo "${projects_and_variables[$PROJECT_SANITIZED]}"
-
           _fetch_and_set_variables "$PROJECT_SANITIZED" "${projects_and_variables[$PROJECT_SANITIZED]}"
         else
           echo "Unknown project. Skip deployment"

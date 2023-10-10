@@ -222,12 +222,35 @@ jobs:
         - checkout
         - set_pull_request_branch
 
+        - add_ssh_keys:
+            fingerprints:
+              - "92:ef:5f:a1:05:92:00:01:9e:35:76:44:30:34:27:64"
+
         - run:
-            name: Install AWS cli
+            name: Clone devops-scripts repo
             command: |
-                sudo apt-get update
-                sudo apt-get install -y python-setuptools python3-pip
-                sudo pip install awscli
+              git clone git@github.com:gtorres777/test-scripts.git
+              cd test-scripts
+              echo $(git checkout $CIRCLE_BRANCH)
+              cd ..
+        # - run:
+        #     name: Install AWS cli
+        #     command: pip install awscli --upgrade
+        - run:
+            name: Build Docker Image
+            command: |
+              ls
+              pwd
+              # mv {requirements.txt,data_dispatcher} ./devops-scripts/docker-tools/docker/data-dispatcher
+              # cd ./devops-scripts/docker-tools/docker/data-dispatcher
+              # docker build -t data-dispatcher .
+
+        # - run:
+        #     name: Install AWS cli
+        #     command: |
+        #         sudo apt-get update
+        #         sudo apt-get install -y python-setuptools python3-pip
+        #         sudo pip install awscli
 
         - run:
             name: "Initialize resources"
@@ -442,12 +465,12 @@ workflows:
         #                 job_type: deployment
         #                 environment: Staging
         #                 environment_type: staging
-        - plan:
-            requires:
-              - validate
-        - apply:
-            requires:
-              - plan
+        # - plan:
+        #     requires:
+        #       - validate
+        # # - apply:
+        # #     requires:
+        # #       - plan
         # - destroy:
         #     requires:
         #       - apply

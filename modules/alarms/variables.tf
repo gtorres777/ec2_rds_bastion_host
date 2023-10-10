@@ -12,31 +12,37 @@ variable "evaluation_periods" {
 
 variable "metric_name" {
   type        = string
+  default = null
 }
 
 variable "namespace" {
   type        = string
+  default = null
 }
 
 variable "period" {
   type        = number
+  default = null
 }
 
 variable "statistic" {
   type        = string
+  default = null
 }
 
 variable "threshold" {
   type        = number
+  default = null
 }
-
 
 variable "dimensions_name" {
   type        = string
+  default = null
 }
 
 variable "dimensions_value" {
   type        = string
+  default = null
 }
 
 variable "alarm_actions" {
@@ -49,31 +55,33 @@ variable "ok_actions" {
   description = "The list of actions to execute when this alarm transitions into an OK state from any other state. Each action is specified as an Amazon Resource Name (ARN)."
 }
 
-# variable "threshold_metric_id" {
-#   type        = string
-#   default     = null
-#   description = "The ID of the metric query."
-# }
+variable "use_metric_query" {
+  description = "Flag to determine whether to use metric queries for the alarm"
+  type        = bool
+  default     = false
+}
 
-# variable "metric_queries" {
-#   type = list(object({
-#     id          = optional(string)
-#     expression  = optional(string)
-#     return_data = optional(string)
-#     metric      = optional(list(object({
-#                     metric_name = string
-#                     namespace   = string
-#                     period      = number
-#                     statistic   = string
-#                   })))
-#   }))
-#   default = [ {
-#     metric = [ {
-#                     metric_name = null
-#                     namespace   = null
-#                     period      = null
-#                     statistic   = null
-#     } ]
-#   } ]
-#   description   = "List of metric queries for an alarm."
-# }
+variable "threshold_metric_id" {
+  type        = string
+  default     = null
+  description = "The ID of the metric query."
+}
+
+variable "metric_queries" {
+  description = "List of metric queries for query-based alarms"
+  default     = null
+  type        = list(object({
+    id         = string
+    expression = optional(string)
+    label      = optional(string)
+    return_data = bool
+    metric    = optional(list(object({
+      metric_name = string
+      namespace   = string
+      period      = number
+      stat        = string
+      unit        = string
+      dimensions  = map(string)
+    })))
+  }))
+}

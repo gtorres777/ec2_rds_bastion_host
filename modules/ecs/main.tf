@@ -1,5 +1,6 @@
 resource "aws_ecs_cluster" "default" {
-  name  = "NEXTCLOUDCLUSTER"
+  name  = var.cluster_name
+  # name  = "NEXTCLOUDCLUSTER"
 
   setting {
     name  = "containerInsights"
@@ -9,7 +10,8 @@ resource "aws_ecs_cluster" "default" {
 
 resource "aws_ecs_service" "project" {
   count           = var.create ? 1 : 0
-  name            = "ecs-service-nextcloud"
+  name            = "${var.service_name}"
+  # name            = "ecs-service-nextcloud"
   cluster         = aws_ecs_cluster.default.arn
   launch_type     = "FARGATE"
   task_definition = aws_ecs_task_definition.project[0].arn
@@ -24,7 +26,8 @@ resource "aws_ecs_service" "project" {
 
   load_balancer {
     target_group_arn = var.target_group_arn
-    container_name   = "ecs-nextcloud-container"
+    container_name   = "ecs-${var.service_name}-container"
+    # container_name   = "ecs-nextcloud-container"
     container_port   = var.task_web_port
   }
 
@@ -32,11 +35,39 @@ resource "aws_ecs_service" "project" {
   propagate_tags          = "SERVICE"
 
   # workaround for https://github.com/hashicorp/terraform/issues/12634
-  depends_on = [
-      var.alb,
+  depends_on = [ var.alb,
       aws_ecs_task_definition.project
     ]
 
+}
+
+module "ecs_security_group" {
+  create      = var.create ? true : false
+  source      = "terraform-aws-modules/security-group/aws"
+  version     = "4.17.1"
+  name        = "${var.service_name}-sg"
+  description = "Default security group for ${var.service_name}"
+  vpc_id      = var.vpc_id
+
+  ingress_cidr_blocks = var.leadgenius_cidrs
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = var.task_web_port
+      to_port     = var.task_web_port
+      protocol    = "tcp"
+      description = "Custom TCP service port"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
+      from_port   = 8888
+      to_port     = 8888
+      protocol    = "tcp"
+      description = "Shell Port"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+  egress_cidr_blocks  = ["0.0.0.0/0"]
+  egress_rules        = ["all-all"]
 }
 
 resource "aws_security_group" "allow-custom-alb" {
@@ -56,7 +87,7 @@ resource "aws_security_group" "allow-custom-alb" {
     to_port     = 65535
     protocol    = "tcp"
     description = "VPC"
-    cidr_blocks = ["11.0.0.0/16"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -142,7 +173,8 @@ resource "aws_iam_policy" "policy" {
         Action = [
           "ecr:BatchGetImage",
           "ecr:GetDownloadUrlForLayer",
-          "ecr:GetAuthorizationToken"
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability"
         ],
         Resource = "*"
       },
@@ -171,105 +203,131 @@ resource "aws_iam_role_policy_attachment" "ecs_tasks_custom_policy" {
 }
 ## END Task Execution Role
 
-resource "aws_cloudwatch_log_group" "nextcloud" {
-  name = "/ecs/nextcloud"
-  retention_in_days = 14
-}
-
-resource "aws_cloudwatch_log_group" "mysql" {
-  name = "/ecs/mysql"
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name = "/ecs/${var.service_name}"
+  # name = "/ecs/nextcloud"
   retention_in_days = 14
 }
 
 resource "aws_ecs_task_definition" "project" {
   count           = var.create ? 1 : 0
 
-  family                   = "nextcloudtask"
+  family                   = "${var.service_name}-cloudtask"
   execution_role_arn       = aws_iam_role.ecs_task_role.arn
   task_role_arn            = aws_iam_role.ecs_tasks_execution_role.arn
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = 512
   memory                   = 1024
+
+
   container_definitions    = <<TASK_DEFINITION
-[
-  {
-    "name": "mysql",
-    "image": "mysql",
-    "environment": [
-      {
-        "name": "MYSQL_ROOT_PASSWORD",
-        "value": "password"
-      },
-      {
-        "name": "MYSQL_DATABASE",
-        "value": "nextcloud"
-      },
-      {
-        "name": "MYSQL_USER",
-        "value": "nextcloud"
-      },
-      {
-        "name": "MYSQL_PASSWORD",
-        "value": "password"
-      }
-    ],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-group": "${aws_cloudwatch_log_group.mysql.name}",
-        "awslogs-region": "us-east-1",
-        "awslogs-stream-prefix": "ecs"
-      }
-    }
-  },
-  {
-    "name": "ecs-nextcloud-container",
-    "image": "nextcloud",
-    "essential": true,
-    "portMappings": [
-      {
-        "containerPort": 80,
-        "hostPort": 80
-      }
-    ],
-    "environment": [
+  [
+    {
+      "name": "ecs-${var.service_name}-container",
+      "image": "${var.image}",
+      "essential": true,
+      "entryPoint": ${jsonencode(var.entry_point)},
+      "environment": ${jsonencode(var.environment_variables)},
+      "portMappings": [
         {
-          "name": "MYSQL_HOST",
-          "value": "db"
-        },
-        {
-          "name": "MYSQL_DATABASE",
-          "value": "nextcloud"
-        },
-        {
-          "name": "MYSQL_USER",
-          "value": "nextcloud"
-        },
-        {
-          "name": "MYSQL_PASSWORD",
-          "value": "password"
-        },
-        {
-          "name": "NEXTCLOUD_TRUSTED_DOMAINS",
-          "value": "cloud.gustavo-td.com"
+          "containerPort": ${var.task_web_port},
+          "hostPort": ${var.task_web_port}
         }
       ],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-group": "${aws_cloudwatch_log_group.nextcloud.name}",
-        "awslogs-region": "us-east-1",
-        "awslogs-stream-prefix": "ecs"
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "${aws_cloudwatch_log_group.ecs_log_group.name}",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "linuxParameters": {
+        "initProcessEnabled": true
       }
-    },
-    "linuxParameters": {
-      "initProcessEnabled": true
     }
-  }
-]
-TASK_DEFINITION
+  ]
+  TASK_DEFINITION
 }
+#   container_definitions    = <<TASK_DEFINITION
+# [
+#   {
+#     "name": "mysql",
+#     "image": "mysql",
+#     "environment": [
+#       {
+#         "name": "MYSQL_ROOT_PASSWORD",
+#         "value": "password"
+#       },
+#       {
+#         "name": "MYSQL_DATABASE",
+#         "value": "nextcloud"
+#       },
+#       {
+#         "name": "MYSQL_USER",
+#         "value": "nextcloud"
+#       },
+#       {
+#         "name": "MYSQL_PASSWORD",
+#         "value": "password"
+#       }
+#     ],
+#     "logConfiguration": {
+#       "logDriver": "awslogs",
+#       "options": {
+#         "awslogs-group": "${aws_cloudwatch_log_group.mysql.name}",
+#         "awslogs-region": "us-east-1",
+#         "awslogs-stream-prefix": "ecs"
+#       }
+#     }
+#   },
+#   {
+#     "name": "ecs-nextcloud-container",
+#     "image": "nextcloud",
+#     "essential": true,
+#     "portMappings": [
+#       {
+#         "containerPort": 80,
+#         "hostPort": 80
+#       }
+#     ],
+#     "environment": [
+#         {
+#           "name": "MYSQL_HOST",
+#           "value": "db"
+#         },
+#         {
+#           "name": "MYSQL_DATABASE",
+#           "value": "nextcloud"
+#         },
+#         {
+#           "name": "MYSQL_USER",
+#           "value": "nextcloud"
+#         },
+#         {
+#           "name": "MYSQL_PASSWORD",
+#           "value": "password"
+#         },
+#         {
+#           "name": "NEXTCLOUD_TRUSTED_DOMAINS",
+#           "value": "cloud.gustavo-td.com"
+#         }
+#       ],
+#     "logConfiguration": {
+#       "logDriver": "awslogs",
+#       "options": {
+#         "awslogs-group": "${aws_cloudwatch_log_group.ecs_log_group.name}",
+#         "awslogs-region": "us-east-1",
+#         "awslogs-stream-prefix": "ecs"
+#       }
+#     },
+#     "linuxParameters": {
+#       "initProcessEnabled": true
+#     }
+#   }
+# ]
+# TASK_DEFINITION
 
 
 
